@@ -8,4 +8,5 @@ Alan Tran
 
 ## Project Supervisor
 Professor [Miguel A. Garzón](http://www.site.uottawa.ca/~mgarzon/)
+
 Faculty Member Ph.D., P.Eng.: School of Electrical Engineering and Computer Science
