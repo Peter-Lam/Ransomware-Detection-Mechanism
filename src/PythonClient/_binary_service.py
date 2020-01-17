@@ -3,7 +3,7 @@
 to VirusTotal to download ransomware binaries. Program should log
 any hashes it is able to download and log ones that are not found
 or failed. The download location for binaries will be based on a
-yaml configuation file. API Key used must be set as an system
+yaml configuration file. API Key used must be set as a system
 environment variable.'''
 
 import json
@@ -59,7 +59,7 @@ def _download_binaries(_hash_json, _vt_url, _file_path):
 
 
 def _introduction():
-    '''Prints an introuction statement and warning'''
+    '''Prints an introduction statement and warning'''
     print("This Python program is used to download binaries of viruses."
           "Please use with EXTREME CAUTION!\n"
           "Before continuing, please verify the download path"
@@ -76,7 +76,7 @@ def _get_config():
             print(exc)
 
 def _get_hashes():
-    '''Reads a json file containing a list of hashes. THIS IS TEMPORARY; read from Elasticsearch'''
+    '''Reads a JSON file containing a list of hashes. THIS IS TEMPORARY; read from Elasticsearch'''
     with open('temp_hashes.json') as file:
         data = json.load(file)
         return data
