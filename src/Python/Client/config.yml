@@ -1,2 +1,2 @@
-binaries_path: ..\..\output\binaries
+binaries_path: ..\..\..\output\binaries
 vt_url: "https://www.virustotal.com/vtapi/v2/file/download"

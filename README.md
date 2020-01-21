@@ -1,4 +1,5 @@
 # Ransomware-Detection-Mechanism
+[![Build Status](https://travis-ci.com/TranAlan/Ransomware-Detection-Mechanism.svg?token=XYhputEuMBMoSF6Pp5xP&branch=master)](https://travis-ci.com/TranAlan/Ransomware-Detection-Mechanism)  
 Ransomeware Detection Mechanism (RDM) is a tool combining machine learning to detect ransomware viruses. Training of the model is done by feeding the machine various binaries of ransomware. This is a 2020 University of Ottawa undergraduate honours project.
 
 ## Project Members
