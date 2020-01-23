@@ -44,7 +44,9 @@ Next is to create a python 3 virtual enviroment (venv) for the project. On CMD o
 
 This will create a venv and folder called RMD-env. To activate the venv you must run the activate script (must be done for every new terminal or CMD).
 ```
-> C:\>RMD-env\Scripts\activate.bat
+> C:\>RMD-env\Scripts\activate.bat (Windows)
+
+> source RMD-env/bin/activate (MacOS)
 ```
 
 Once the venv is activated, python will be run with the venv and all libraries can be installed specifically in the venv. Now we must install key python libraries.
