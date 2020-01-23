@@ -1,11 +1,12 @@
 # Ransomware-Detection-Mechanism
 [![Build Status](https://travis-ci.com/TranAlan/Ransomware-Detection-Mechanism.svg?token=XYhputEuMBMoSF6Pp5xP&branch=master)](https://travis-ci.com/TranAlan/Ransomware-Detection-Mechanism)  
-Ransomeware Detection Mechanism (RDM) is a tool combining machine learning to detect ransomware viruses. Training of the model is done by feeding the machine various binaries of ransomware. This is a 2020 University of Ottawa undergraduate honours project.
+Ransomware Detection Mechanism (RDM) is a tool combining machine learning to detect ransomware viruses, namely Ryuk. Training of the model is done by feeding the machine various binaries of ransomware. This is a 2020 University of Ottawa undergraduate honours project.
 
 ## Project Members
-Ali Bhangoo  
-Peter Lam  
-Alan Tran
+* [Alan Tran](https://www.linkedin.com/in/alantran29/)
+* [Ali Bhangoo](https://www.linkedin.com/in/ali-bhangoo-b32828105/)  
+* [Peter Lam](https://www.linkedin.com/in/peter-lam-612a00138/)
+
 
 ## Project Supervisor
 Professor [Miguel A. Garzón](http://www.site.uottawa.ca/~mgarzon/)
@@ -14,20 +15,19 @@ Faculty Member Ph.D., P.Eng.: School of Electrical Engineering and Computer Scie
 ___
 ## Getting Started
 
-Follow these instructions to setup a development enviroment on your local machine. This is for development or testing purposes.
+Follow these instructions to setup a development environment on your local machine. This is for development or testing purposes.
 
 ### Prerequisites
 
-You must install and setup these softwares to be able to run the project.
+You must install and setup the following to be able to run the project.
 
-```
-Setup Python Environment
-Install LogStash
-Install Elasticsearch
-Install Kibana
-```
 
-### Installing
+* [Setup Python Environment](#Python-Environment)
+* [Install Elasticsearch](#Elasticsearch)
+* [Install Kibana](#Kibana)
+
+
+### Python Environment
 
 First we must install [Python 3](https://www.python.org/) and add Python to your PATH. 
 
@@ -58,3 +58,18 @@ Once the venv is activated, python will be run with the venv and all libraries c
 > (RDM-env) C:\Users\alan1\pip install pyyaml
 ```
 
+### Elasticsearch
+1. Download and unzip from https://www.elastic.co/downloads/elasticsearch
+2. Run bin/elasticsearch (or bin\elasticsearch.bat on Windows)
+3. Run curl http://localhost:9200/ or Invoke-RestMethod http://localhost:9200 with PowerShell
+
+
+### Kibana
+1. Download and unzip from https://www.elastic.co/downloads/kibana
+2. Open config/kibana.yml in an editor
+3. Set elasticsearch.hosts to point at your Elasticsearch instance
+4. Run bin/kibana (or bin\kibana.bat on Windows)
+5. Point your browser at http://localhost:5601   
+### Setting up RDM Kibana Environment
+
+For information on how to set up the RDM Kibana EEnvironment with the IOCS, see the [Setting Up Kibana Environment](https://github.com/TranAlan/Ransomware-Detection-Mechanism/wiki/Setting-Up-Kibana-Environment) page.
