@@ -46,7 +46,7 @@ This will create a venv and folder called RMD-env. To activate the venv you must
 ```
 > C:\>RMD-env\Scripts\activate.bat (Windows)
 
-> source RMD-env/bin/activate (MacOS)
+> $ source RMD-env/bin/activate (MacOS)
 ```
 
 Once the venv is activated, python will be run with the venv and all libraries can be installed specifically in the venv. Now we must install key python libraries.
@@ -70,6 +70,6 @@ Once the venv is activated, python will be run with the venv and all libraries c
 3. Set elasticsearch.hosts to point at your Elasticsearch instance
 4. Run bin/kibana (or bin\kibana.bat on Windows)
 5. Point your browser at http://localhost:5601   
-### Setting up RDM Kibana Environment
 
+### Setting up RDM Kibana Environment
 For information on how to set up the RDM Kibana EEnvironment with the IOCS, see the [Setting Up Kibana Environment](https://github.com/TranAlan/Ransomware-Detection-Mechanism/wiki/Setting-Up-Kibana-Environment) page.
