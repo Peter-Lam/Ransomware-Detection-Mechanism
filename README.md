@@ -21,12 +21,11 @@ Follow these instructions to setup a development environment on your local machi
 
 You must install and setup the following to be able to run the project.
 
-```
-Setup Python Environment
-Install LogStash
-Install Elasticsearch
-Install Kibana
-```
+
+* [Setup Python Environment](#Python-Environment)
+* [Install Elasticsearch](#Elasticsearch)
+* [Install Kibana](#Kibana)
+
 
 ### Python Environment
 
@@ -45,7 +44,9 @@ Next is to create a python 3 virtual enviroment (venv) for the project. On CMD o
 
 This will create a venv and folder called RMD-env. To activate the venv you must run the activate script (must be done for every new terminal or CMD).
 ```
-> C:\>RMD-env\Scripts\activate.bat
+> C:\>RMD-env\Scripts\activate.bat (Windows)
+
+> $ source RMD-env/bin/activate (MacOS)
 ```
 
 Once the venv is activated, python will be run with the venv and all libraries can be installed specifically in the venv. Now we must install key python libraries.
@@ -57,16 +58,18 @@ Once the venv is activated, python will be run with the venv and all libraries c
 > (RDM-env) C:\Users\alan1\pip install pyyaml
 ```
 
-### Elastic Search
+### Elasticsearch
 1. Download and unzip from https://www.elastic.co/downloads/elasticsearch
 2. Run bin/elasticsearch (or bin\elasticsearch.bat on Windows)
 3. Run curl http://localhost:9200/ or Invoke-RestMethod http://localhost:9200 with PowerShell
-   
+
 
 ### Kibana
 1. Download and unzip from https://www.elastic.co/downloads/kibana
 2. Open config/kibana.yml in an editor
 3. Set elasticsearch.hosts to point at your Elasticsearch instance
-   
-### Logstash
-1. Download and unzip from https://www.elastic.co/downloads/logstash
+4. Run bin/kibana (or bin\kibana.bat on Windows)
+5. Point your browser at http://localhost:5601   
+
+### Setting up RDM Kibana Environment
+For information on how to set up the RDM Kibana EEnvironment with the IOCS, see the [Setting Up Kibana Environment](https://github.com/TranAlan/Ransomware-Detection-Mechanism/wiki/Setting-Up-Kibana-Environment) page.
