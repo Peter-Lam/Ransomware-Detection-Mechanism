@@ -1,4 +1,4 @@
-#!/user/RDM-env/Scripts python
+#!/usr/bin/python
 '''This is a python program which will be used to send requests
 to VirusTotal to download ransomware binaries. Program should log
 any hashes it is able to download and log ones that are not found
