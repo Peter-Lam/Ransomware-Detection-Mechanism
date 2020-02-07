@@ -12,8 +12,7 @@ class TestDNSLookup(unittest.TestCase):
     '''Class to test dns_lookup'''
 
     def test_bulk_lookup(self):
-        input_path = r'input\urls.txt'
-
+        input_path = './input/urls.txt'
         result = dns_lookup.bulk_lookup(input_path)
         self.assertEqual(2, len(result))
 
