@@ -1,6 +1,7 @@
-# Ransomware-Detection-Mechanism
+Ransomware-Detection-Mechanism
+==============================
 [![Build Status](https://travis-ci.com/TranAlan/Ransomware-Detection-Mechanism.svg?token=XYhputEuMBMoSF6Pp5xP&branch=master)](https://travis-ci.com/TranAlan/Ransomware-Detection-Mechanism)  
-Ransomware Detection Mechanism (RDM) is a tool combining machine learning to detect ransomware viruses, namely Ryuk. Training of the model is done by feeding the machine various binaries of ransomware. This is a 2020 University of Ottawa undergraduate honours project.
+Ransomware Detection Mechanism (RDM) is a tool combining machine learning to detect ransomware viruses within a network. This is a 2020 University of Ottawa undergraduate honours project.
 
 ## Project Members
 * [Alan Tran](https://www.linkedin.com/in/alantran29/)
@@ -12,6 +13,60 @@ Ransomware Detection Mechanism (RDM) is a tool combining machine learning to det
 Professor [Miguel A. Garzón](http://www.site.uottawa.ca/~mgarzon/)
 
 Faculty Member Ph.D., P.Eng.: School of Electrical Engineering and Computer Science
+___
+Project Organization
+------------
+
+    ├── LICENSE
+    ├── Makefile           <- Makefile with commands like `make data` or `make train`
+    ├── README.md          <- The top-level README for developers using this project.
+    ├── data
+    │   ├── external       <- Data from third party sources.
+    │   ├── interim        <- Intermediate data that has been transformed.
+    │   ├── processed      <- The final, canonical data sets for modeling.
+    │   └── raw            <- The original, immutable data dump.
+    │
+    ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
+    │
+    ├── models             <- Trained and serialized models, model predictions, or model summaries
+    │
+    ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
+    │                         the creator's initials, and a short `-` delimited description, e.g.
+    │                         `1.0-jqp-initial-data-exploration`.
+    │
+    ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
+    │
+    ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
+    │   └── figures        <- Generated graphics and figures to be used in reporting
+    │
+    ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
+    │                         generated with `pip freeze > requirements.txt`
+    │
+    ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
+    ├── src                <- Source code for use in this project.
+    │   ├── __init__.py    <- Makes src a Python module
+    │   │
+    │   ├── data           <- Scripts to download or generate data
+    │   │   └── make_dataset.py
+    │   │
+    │   ├── features       <- Scripts to turn raw data into features for modeling
+    │   │   └── build_features.py
+    │   │
+    │   ├── models         <- Scripts to train models and then use trained models to make
+    │   │   │                 predictions
+    │   │   ├── predict_model.py
+    │   │   └── train_model.py
+    │   │
+    │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
+    │       └── visualize.py
+    │
+    └── tox.ini            <- tox file with settings for running tox; see tox.testrun.org
+
+
+--------
+
+<p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
+
 ___
 ## Getting Started
 
@@ -73,3 +128,4 @@ Once the venv is activated, python will be run with the venv and all libraries c
 
 ### Setting up RDM Kibana Environment
 For information on how to set up the RDM Kibana EEnvironment with the IOCS, see the [Setting Up Kibana Environment](https://github.com/TranAlan/Ransomware-Detection-Mechanism/wiki/Setting-Up-Kibana-Environment) page.
+
