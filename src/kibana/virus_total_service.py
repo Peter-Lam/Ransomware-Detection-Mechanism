@@ -9,7 +9,8 @@ environment variable.'''
 import json
 import os
 import requests
-import yaml
+
+from .utils.file_util import load_yaml
 
 VT_API_PARAM = 'apikey'
 VT_HASH_PARAM = 'hash'
@@ -21,7 +22,7 @@ def main():
     user_response = input()
     print()
     if user_response == "continue":
-        config = get_config()
+        config = load_yaml('./config.yml')
         vt_url = config['vt_url']
         binaries_path = config['binaries_path']
         if vt_url != '':
@@ -63,14 +64,6 @@ def introduction():
           "and the list of hashes to be downloaded. \nDo not "
           "download and run report on the same malware twice.\n"
           "Type 'continue' to go through or 'exit' to leave program.\n")
-
-def get_config():
-    '''Reads the configuration file and returns the object'''
-    with open("config.yml", 'r') as stream:
-        try:
-            return yaml.safe_load(stream)
-        except yaml.YAMLError as exc:
-            print(exc)
 
 def get_hashes():
     '''Reads a JSON file containing a list of hashes. THIS IS TEMPORARY; read from Elasticsearch'''

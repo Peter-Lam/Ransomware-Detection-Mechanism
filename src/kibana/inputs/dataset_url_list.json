@@ -1,0 +1,157 @@
+[
+    {   
+        "path": "CTU-Malware-Capture-Botnet-114-1/2015-04-09_capture-win2.binetflow",
+        "virus": "emotet",
+        "md5": "8baa9b809b591a11af423824f4d9726a"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-114-2/2015-04-22_capture-win2.binetflow",
+        "virus": "emotet",
+        "md5": "8baa9b809b591a11af423824f4d9726a"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-114-3/2015-06-07_capture-win2.binetflow",
+        "virus": "emotet",
+        "md5": "8baa9b809b591a11af423824f4d9726a"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-114-4/2015-07-08_capture-win2.binetflow",
+        "virus": "emotet",
+        "md5": "8baa9b809b591a11af423824f4d9726a"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-124-1/2015-04-30_capture-win5.binetflow",
+        "virus": "emotet",
+        "md5": "84b96b96f60284a21addb1b2873d6aaa"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-264-1/2017-06-24_win3.binetflow",
+        "virus": "emotet",
+        "md5": "28140bd636324bad2f0e8394f3e7f723"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-264-2/2017-06-24_win15.binetflow",
+        "virus": "emotet",
+        "md5": "28140bd636324bad2f0e8394f3e7f723"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-268-1/2017-06-24_win7.binetflow",
+        "virus": "emotet",
+        "md5": "ac765e9809de73f444cd2cce04256dac"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-269-1/2017-06-24_win8.binetflow",
+        "virus": "emotet",
+        "md5": "3988863fb18686dc6657245afddb597d"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-271-1/2017-06-24_win10.binetflow",
+        "virus": "emotet",
+        "md5": "a2350072233e3547a07a2b38509e8711"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-272-1/2017-06-24_win11.binetflow",
+        "virus": "emotet",
+        "md5": "8a5d3cada819fe7fd9db67d8c0af120e"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-276-1/2017-06-24_win16.binetflow",
+        "virus": "emotet",
+        "md5": "fa0cea9b855b83dc6a9f8d931882efd2"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-276-2/2017-06-24_win17.binetflow",
+        "virus": "emotet",
+        "md5": "fa0cea9b855b83dc6a9f8d931882efd2"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-279-1/2017-06-24_win20.binetflow",
+        "virus": "emotet",
+        "md5": "402d735e59d191b2bde2f5f094688de5"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-238-1/2017-3-30_win6.binetflow",
+        "virus": "trickbot",
+        "md5": "b6d9e83f6e157c259da155e562bfe04b"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-239-1/2017-3-30_win7.binetflow",
+        "virus": "trickbot",
+        "md5": "b0aecb48821a18210a2838fbeed800f1"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-240-1/2017-3-29_win8.binetflow",
+        "virus": "trickbot",
+        "md5": "c957c5be0a2985adf600988f477cb491"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-241-1/2017-3-30_win9.binetflow",
+        "virus": "trickbot",
+        "md5": "7c919970a593c41ec104fa2fb7f0d12b"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-242-1/2017-3-30_win10.binetflow",
+        "virus": "trickbot",
+        "md5": "d2bff49cba429d2c53fc4a2852cd9977"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-243-1/2017-04-12_win5.binetflow",
+        "virus": "trickbot",
+        "md5": "c4ea8104af713582afb76f773a037f28"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-244-1/2017-04-12_win11.binetflow",
+        "virus": "trickbot",
+        "md5": "4c1e2650a7d104b695a853f64a455cfa"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-247-1/2017-04-17_win14.binetflow",
+        "virus": "trickbot",
+        "md5": "0afaa4f4137b846e456e52f72faf9aa0"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-261-1/2017-05-15_win15.binetflow",
+        "virus": "trickbot",
+        "md5": "bb9e0b23fc6cba27ba670547b7890273"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-261-2/2017-06-07_win12.binetflow",
+        "virus": "trickbot",
+        "md5": "bb9e0b23fc6cba27ba670547b7890273"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-265-1/2017-06-24_win4.binetflow",
+        "virus": "trickbot",
+        "md5": "45160aa23d640f8d1bcb263c179f84f9"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-266-1/2017-06-24_win5.binetflow",
+        "virus": "trickbot",
+        "md5": "be4c49482221630647a8038ce977fc4f"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-267-1/2017-06-24_win6.binetflow",
+        "virus": "trickbot",
+        "md5": "9d166a822439a47eb2dfad1aeb823638"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-273-1/2017-06-24_win12.binetflow",
+        "virus": "trickbot",
+        "md5": "49c19450ce74c4941940c70b8c51f22a"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-324-1/2018-01-30_win13.binetflow",
+        "virus": "trickbot",
+        "md5": "3d5eeaa64da02d7066e5f57c25368757"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-325-1/2018-01-30_win9.binetflow",
+        "virus": "trickbot",
+        "md5": "011517b0b3c6a79d740033df71120392"
+    },
+    {
+        "path": "CTU-Malware-Capture-Botnet-327-1/capture_win11.binetflow",
+        "virus": "trickbot",
+        "md5": "2b48789d9272700de5405bf9a9c05204"
+    }
+]
