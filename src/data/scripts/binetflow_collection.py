@@ -19,14 +19,13 @@ def collect_datasets():
     '''Retrieves dataset_json and sends request to get the bi netflow
     for each object'''
     config = load_yaml('../config.yml')
-    base_url = config['stratosphere_binetflow_url']
     json_path = config['dataset_path']
     output_base_path = config['binet_output_path']
     dataset_json = get_dataset_json(json_path)
     urllib3.disable_warnings()
     for obj in dataset_json:
-        download_url = 'https://' + base_url + '/' + obj['path']
-        file_name = obj['path'].split('/')[0]
+        download_url = obj['source']
+        file_name = download_url.split('/')[-2]
         if not os.path.isfile(output_base_path + '/' + file_name + '.csv'):
             binet_flow = download_binetflow(download_url)
             if binet_flow:
