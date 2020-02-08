@@ -3,8 +3,8 @@
 import sys
 import unittest
 
-sys.path.append('../')
-from utils import dns_lookup # pylint: disable=C0413,E0401
+sys.path.append('../../')
+from utils import dns_lookup
 
 class TestDNSLookup(unittest.TestCase):
     '''Class to test dns_lookup'''

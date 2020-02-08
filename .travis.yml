@@ -6,5 +6,7 @@ install:
   - pip install -r ./requirements.txt
 # command to run tests
 script:
-  - pylint ./src/kibana/
+  - pylint ./src/data/kibana/
+  - pylint ./src/data/scripts/
+  - pylint ./src/data/utils/
   - ./travis_build.sh

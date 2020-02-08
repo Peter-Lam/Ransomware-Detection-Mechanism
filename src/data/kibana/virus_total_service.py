@@ -8,9 +8,11 @@ environment variable.'''
 
 import json
 import os
+import sys
 import requests
 
-from .utils.file_util import load_yaml
+sys.path.append('../')
+from utils.file_util import load_yaml
 
 VT_API_PARAM = 'apikey'
 VT_HASH_PARAM = 'hash'

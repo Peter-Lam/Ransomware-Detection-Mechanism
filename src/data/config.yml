@@ -1,6 +1,6 @@
 binaries_path: ../../../output/binaries
-binet_output_path: ./output/binetflow
-dataset_path: ./inputs/dataset_url_list.json
+binet_output_path: ../output/binetflow
+dataset_path: ../inputs/dataset_url_list.json
 elastic_search_url: localhost:9200
 stratosphere_ds_url: stratosphereips.org/datasets-malware
 stratosphere_binetflow_url: mcfp.felk.cvut.cz/publicDatasets
