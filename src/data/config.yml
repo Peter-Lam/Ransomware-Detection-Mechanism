@@ -1,7 +1,7 @@
 binaries_path: ../../../output/binaries
-binet_output_path: ../output/binetflow
-dataset_path: ../inputs/dataset_url_list.json
+binet_output_path: ./output/binetflow
+raw_output_path: ../../data/raw/input.csv
+dataset_path: ./inputs/dataset_url_list.json
 elastic_search_url: localhost:9200
-stratosphere_ds_url: stratosphereips.org/datasets-malware
 stratosphere_binetflow_url: mcfp.felk.cvut.cz/publicDatasets
 vt_url: "https://www.virustotal.com/vtapi/v2/file/download"

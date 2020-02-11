@@ -1,6 +1,8 @@
 #!/usr/bin/python
-'''This is a python program which is used to automate the process of
-updating ioc JSON file with the appropriate values'''
+'''
+    This is a python program which is used to automate the process of
+    updating ioc JSON file with the appropriate values
+'''
 
 import sys
 import os.path as path

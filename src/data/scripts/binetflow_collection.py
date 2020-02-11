@@ -1,24 +1,20 @@
 #!/usr/bin/python
-'''This is a python program will collect the network flow of viruses
-through requests'''
+'''
+    This is a python program will collect the network flow of viruses
+    through requests
+'''
 
 import os
-import sys
 import time
 import urllib3
 import requests
 
-sys.path.append('../')
 from utils.file_util import load_json, load_yaml
 
 def main():
-    '''main'''
-    collect_datasets()
-
-def collect_datasets():
     '''Retrieves dataset_json and sends request to get the bi netflow
     for each object'''
-    config = load_yaml('../config.yml')
+    config = load_yaml('./config.yml')
     json_path = config['dataset_path']
     output_base_path = config['binet_output_path']
     dataset_json = get_dataset_json(json_path)
@@ -53,6 +49,3 @@ def write_binetflow_to_file(output_path, bytes_output):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path + '.csv', 'wb') as file:
         file.write(bytes_output)
-
-if __name__ == '__main__':
-    main()
