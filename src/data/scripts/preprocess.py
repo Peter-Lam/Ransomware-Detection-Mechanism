@@ -6,8 +6,8 @@
 from os import makedirs
 from os.path import dirname
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from utils.file_util import load_yaml
 
