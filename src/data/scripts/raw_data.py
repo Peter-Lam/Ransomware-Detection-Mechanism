@@ -5,7 +5,7 @@
 import re
 from os import listdir, makedirs
 from os.path import dirname, isfile, join
-from utils.file_util import load_yaml
+from utils.file_util import load_json, load_yaml
 
 def main():
     ''' create input.csv in project/data/raw/ directory '''
@@ -16,14 +16,17 @@ def make_raw_data():
     config = load_yaml('./config.yml')
     binetflow_path = config['binet_output_path']
     raw_output_path = config['raw_output_path']
+    dataset_path = config['dataset_path']
+    dataset_json = load_json(dataset_path)
+    dict_mal_hosts = dict_infected_hosts(dataset_json)
     file_list = get_file_list(binetflow_path)
-    create_input_csv(file_list, binetflow_path, raw_output_path)
+    create_input_csv(file_list, binetflow_path, raw_output_path, dict_mal_hosts)
 
 def get_file_list(binetflow_path):
     '''Returns a list of all files in the given directory path'''
     return [file for file in listdir(binetflow_path) if isfile(join(binetflow_path, file))]
 
-def create_input_csv(file_list, dir_path, output_path):
+def create_input_csv(file_list, dir_path, output_path, dict_mal_hosts):
     '''
         Parse through each binetflow file and append to a brand new file called input.csv.
         Some files have extra columns srcUdata,dstUdata.
@@ -32,7 +35,6 @@ def create_input_csv(file_list, dir_path, output_path):
     '''
     # Majority files have 15 columns
     default_len = 15
-
     if file_list:
         makedirs(dirname(output_path), exist_ok=True)
         with open(output_path, 'w') as input_file:
@@ -86,6 +88,8 @@ def create_input_csv(file_list, dir_path, output_path):
                                 additions = [dstu, row_l[-1]]
                                 row_l = row_l[:default_len]
                                 row_l.extend(additions)
+                        row_l[-1] = str(int(row_l[3] in dict_mal_hosts[file_name]
+                                            or row_l[6] in dict_mal_hosts[file_name])) + '\n'
                         line = ','.join(row_l) # Form row as a string
                         input_file.write(line) # Write line to input.csv
                         line = binet_file.readline() # Get Next row
@@ -107,3 +111,14 @@ def encapsulate_str(string):
         Encapsulates string with double quotes
     '''
     return  "\""+ string + "\""
+
+def dict_infected_hosts(dataset_json):
+    '''
+        Iterates through the dataset_json file to
+        make a dictionary with a key: file_name, value: ip
+    '''
+    dict_hosts = {}
+    for data in dataset_json:
+        file_name = data['source'].split('/')[-2] + '.csv'
+        dict_hosts[file_name] = data['infected_host']
+    return dict_hosts

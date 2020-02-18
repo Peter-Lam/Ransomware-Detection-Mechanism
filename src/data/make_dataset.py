@@ -8,8 +8,7 @@ import logging
 import click
 # from pathlib import Path
 # from dotenv import find_dotenv, load_dotenv
-from scripts import binetflow_collection
-from scripts import raw_data
+from scripts import binetflow_collection, raw_data, interim, preprocess
 
 
 @click.command()
@@ -26,10 +25,20 @@ def main():
     logger.info('1. making raw data set')
     logger.info('1.a downloading bi netflow')
     binetflow_collection.main()
+
     logger.info('1.b create input.csv')
     raw_data.main()
     logger.info('raw data has been created')
-    logger.info('making final data set from raw data')
+
+    logger.info('1.c create interim.csv')
+    interim.main()
+    logger.info('interim data has been created')
+
+    logger.info('1.d create preprocessed.csv')
+    preprocess.main()
+    logger.info('preprocessed data has been created')
+
+    # logger.info('making final data set from raw data')
 
 
 if __name__ == '__main__':
