@@ -143,15 +143,15 @@
 {"index":{"_index":"ioc","_id":71}}
 {"type":"MD5","value":"d348f536e214a47655af387408b4fca5","malware":"ryuk","source":"https://littlefield.co/threes-a-crowd-new-trickbot-emotet-ryuk-ransomware-16d1e25f72f4"}
 {"index":{"_index":"ioc","_id":72}}
-{"type":"URL","value":"efreedommaker[.]com","malware":"emotet","source":"https://www.cybereason.com/blog/triple-threat-emotet-deploys-trickbot-to-steal-data-spread-ryuk-ransomware"}
+{"type":"DOMAIN","value":"efreedommaker[.]com","malware":"emotet","source":"https://www.cybereason.com/blog/triple-threat-emotet-deploys-trickbot-to-steal-data-spread-ryuk-ransomware"}
 {"index":{"_index":"ioc","_id":73}}
-{"type":"URL","value":"retro11legendblue[.]com","malware":"emotet","source":"https://www.cybereason.com/blog/triple-threat-emotet-deploys-trickbot-to-steal-data-spread-ryuk-ransomware"}
+{"type":"DOMAIN","value":"retro11legendblue[.]com","malware":"emotet","source":"https://www.cybereason.com/blog/triple-threat-emotet-deploys-trickbot-to-steal-data-spread-ryuk-ransomware"}
 {"index":{"_index":"ioc","_id":74}}
-{"type":"URL","value":"oussamatravel[.]com","malware":"emotet","source":"https://www.cybereason.com/blog/triple-threat-emotet-deploys-trickbot-to-steal-data-spread-ryuk-ransomware"}
+{"type":"DOMAIN","value":"oussamatravel[.]com","malware":"emotet","source":"https://www.cybereason.com/blog/triple-threat-emotet-deploys-trickbot-to-steal-data-spread-ryuk-ransomware"}
 {"index":{"_index":"ioc","_id":75}}
-{"type":"URL","value":"cashcow[.]ai","malware":"emotet","source":"https://www.cybereason.com/blog/triple-threat-emotet-deploys-trickbot-to-steal-data-spread-ryuk-ransomware"}
+{"type":"DOMAIN","value":"cashcow[.]ai","malware":"emotet","source":"https://www.cybereason.com/blog/triple-threat-emotet-deploys-trickbot-to-steal-data-spread-ryuk-ransomware"}
 {"index":{"_index":"ioc","_id":76}}
-{"type":"URL","value":"shahdazma[.]com ","malware":"emotet","source":"https://www.cybereason.com/blog/triple-threat-emotet-deploys-trickbot-to-steal-data-spread-ryuk-ransomware"}
+{"type":"DOMAIN","value":"shahdazma[.]com ","malware":"emotet","source":"https://www.cybereason.com/blog/triple-threat-emotet-deploys-trickbot-to-steal-data-spread-ryuk-ransomware"}
 {"index":{"_index":"ioc","_id":77}}
 {"type":"IP","value":"69.164.196.21","malware":"trickbot","source":"https://www.cybereason.com/blog/triple-threat-emotet-deploys-trickbot-to-steal-data-spread-ryuk-ransomware"}
 {"index":{"_index":"ioc","_id":78}}
