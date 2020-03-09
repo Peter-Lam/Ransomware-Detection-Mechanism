@@ -1,5 +1,6 @@
 
-dataset_path: ../inputs/dataset_url_list.json
+binet_output_path: ./output/binetflow
+dataset_path: ./inputs/dataset_url_list.json
 elastic_search_url: localhost:9200
 interim_output_path: ../../data/interim/interim.csv
 preprocessed_output_path: ../../data/preprocessed/preprocessed.csv

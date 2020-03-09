@@ -2,6 +2,7 @@
 '''
     This is a python program will create interim.csv
 '''
+import socket
 
 from os import makedirs
 from os.path import dirname
@@ -14,7 +15,6 @@ def main():
 def make_interim():
     '''
         Read input.csv and remove rows null  {srcaddr, dstaddr, srcport, dstport}
-        Add label: benign = 0, malicious = 1
     '''
     config = load_yaml('./config.yml')
     raw_output_path = config['raw_output_path']
@@ -29,7 +29,12 @@ def make_interim():
             while line:
                 row_l = remove_srcu_dstu(line)
                 if not mising_addr_info(row_l[3], row_l[4], row_l[6], row_l[7]):
-                    interim_file.write(','.join(row_l))
+                    try:
+                        socket.inet_aton(row_l[3])
+                        socket.inet_aton(row_l[6])
+                        interim_file.write(','.join(row_l))
+                    except OSError:
+                        pass
                 line = input_file.readline()
 
 def mising_addr_info(src_addr, src_port, dst_addr, dst_port):
