@@ -93,10 +93,10 @@ def populate_hash(hash_list, vt_url, api_limit, debug=None):
                  'percent_score': percent, 'scan_date': scan_date})
         else:
             # Update existing hashes
-            for index in range(len(response)):
-                total = response[index]["total"] if "total" in response[index] else None
-                positives = response[index]["positives"] if "positives" in response[index] else None
-                scan_date = response[index]["scan_date"] if "scan_date" in response[index] else None
+            for index, value in enumerate(response):
+                total = value["total"] if "total" in value else None
+                positives = value["positives"] if "positives" in value else None
+                scan_date = value["scan_date"] if "scan_date" in value else None
                 percent = round((positives/total)*100,
                                 2) if (positives and total) else None
 
@@ -119,7 +119,6 @@ def populate_ip(ip_list, vt_url, debug=None):
         resource = value['value']
         # Call VT Api
         response = call_api(vt_url, "ip", resource)
-        is_valid = response["response_code"]
         # Update existing hashes
         country = response["country"] if "country" in response else None
         continent = response["continent"] if "continent" in response else None
@@ -144,7 +143,8 @@ def populate_ip(ip_list, vt_url, debug=None):
             total_detected_urls = 0
 
         # Updating dictionaries with new values
-        value.update({'is_valid': is_valid, 'country': country, 'continent': continent,
+        value.update({'is_valid': response["response_code"], 'country': country,
+                      'continent': continent,
                       'total_detected_urls': total_detected_urls, 'total': total,
                       'positives': positives, 'percent_score': percent,
                       'scan_date': scan_date})

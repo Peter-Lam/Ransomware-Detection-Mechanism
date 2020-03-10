@@ -2,8 +2,8 @@
 '''File containing file utility functions such as opening, reading, writing'''
 
 import json
-import yaml
 import os
+import yaml
 
 
 def load_file(path):
