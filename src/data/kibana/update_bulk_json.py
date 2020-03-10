@@ -13,6 +13,7 @@ sys.path.append('../')
 import utils.file_util as util
 import json_translator as translator
 import update_virus_total_data as vt_updater
+from ip_info_service import ip_info_service
 # Declaring globals
 FILE_PATH = pathlib.Path(__file__).parent.absolute()
 # Holds VT API information
@@ -67,6 +68,7 @@ def is_valid_ip(ip):
         return True
     except socket.error:
         # Not legal
+        print(f"The following ip is not valid, skipping: {ip}")
         return False
 
 
@@ -117,19 +119,17 @@ def main():
         if ioc_type == 'IP':
             resource = value.replace('[', '').replace(']', '').strip()
             # If the ip is not valid then skipping
-            if not is_valid_ip(value):
-                print(f"The following ip is not valid, skipping: {value}")
-                continue
+            if not is_valid_ip(resource): continue
         else:
-            if ioc_type == 'MD5' and not is_valid_md5(value):
-                continue
-            if ioc_type == 'SHA256' and not is_valid_sha256(value):
-                continue
             resource = value.strip()
+            if ioc_type == 'MD5' and not is_valid_md5(resource):
+                continue
+            if ioc_type == 'SHA256' and not is_valid_sha256(resource):
+                continue
         base_info.append({'type': ioc_type, 'value': resource,
                           'malware': malware_type, 'source': source})
 
-    # Call Virus Total API to get missing data
+    # Call Virus Total and IPInfo API to get missing data
     if len(base_info) == 0:
         print("No valid values found, closing program")
         exit()
@@ -139,8 +139,10 @@ def main():
             base_info, CONFIG['vt_report'], CONFIG['api_limit'])
     elif ioc_type == 'IP':
         print("Populating ip information  from Virus Total...")
-        updated_values = vt_updater.populate_ip(
+        vt_updated_values = vt_updater.populate_ip(
             base_info, CONFIG['vt_ip'])
+        print("Propulating ip information from IPInfo")
+        updated_values = ip_info_service(CONFIG['ip_api'], vt_updated_values)
     elif ioc_type == 'URL' or ioc_type == 'DOMAIN':
         print("Populating domain information from Virus Total...")
         updated_values = vt_updater.populate_domain(

@@ -9,9 +9,6 @@ import requests
 sys.path.append('../')
 import json_translator as translator
 import utils.file_util as util
-VT_API_PARAM = 'apikey'
-VT_HASH_PARAM = 'hash'
-API_ENV_VAR = 'RDM_API_KEY'
 FILE_PATH = pathlib.Path(__file__).parent.absolute()
 CONFIG = util.load_yaml('{}/config.yml'.format(FILE_PATH.parent))
 
