@@ -3,6 +3,7 @@
 
 import json
 import yaml
+import os
 
 
 def load_file(path):
@@ -38,7 +39,14 @@ def write_bulk_api(data, output_path):
 
 def update_json(data, output_path):
     '''Appends data to existing json file'''
-    file_contents = load_json(output_path)
-    for row in data:
-        file_contents.append(row)
-    write_json(file_contents, output_path)
+    if os.path.exists(output_path):
+        file_contents = load_json(output_path)
+        for row in data:
+            file_contents.append(row)
+        write_json(file_contents, output_path)
+
+
+def delete_file(path):
+    '''Deletes file if it exists'''
+    if os.path.exists(path):
+        os.remove(path)

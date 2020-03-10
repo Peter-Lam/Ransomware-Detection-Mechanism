@@ -1,16 +1,14 @@
 #!/usr/bin/python
 '''This python script will update the existing ioc list to add more values for Kibana.'''
 
-
-
 import time
 import pathlib
 import json
 import sys
 import requests
 sys.path.append('../')
-import utils.file_util as util
 import json_translator as translator
+import utils.file_util as util
 VT_API_PARAM = 'apikey'
 VT_HASH_PARAM = 'hash'
 API_ENV_VAR = 'RDM_API_KEY'
@@ -18,10 +16,9 @@ FILE_PATH = pathlib.Path(__file__).parent.absolute()
 CONFIG = util.load_yaml('{}/config.yml'.format(FILE_PATH.parent))
 
 
-def get_values():
+def get_values(bulk_api_file_path):
     '''Gather the values of returning lists of hashes, ips and urls'''
-    ioc_list = translator.convert_to_json(
-        '{}/inputs/ioc_list.json'.format(FILE_PATH.parent))
+    ioc_list = translator.convert_to_json(bulk_api_file_path)
     hash_list = []
     ip_list = []
     domain_list = []
@@ -66,7 +63,7 @@ def call_api(vt_url, resource_name, resource):
     return response.json()
 
 
-def populate_hash(hash_list, vt_url, api_limit):
+def populate_hash(hash_list, vt_url, api_limit, debug=None):
     '''Populating rows with hashes with missing data, returns lists of dicts of updated data'''
 
     hash_len = len(hash_list)
@@ -99,7 +96,7 @@ def populate_hash(hash_list, vt_url, api_limit):
                  'percent_score': percent, 'scan_date': scan_date})
         else:
             # Update existing hashes
-            for index in enumerate(response):
+            for index in range(len(response)):
                 total = response[index]["total"] if "total" in response[index] else None
                 positives = response[index]["positives"] if "positives" in response[index] else None
                 scan_date = response[index]["scan_date"] if "scan_date" in response[index] else None
@@ -110,14 +107,15 @@ def populate_hash(hash_list, vt_url, api_limit):
                 hash_list[num+index].update({'total': total, 'positives': positives,
                                              'percent_score': percent, 'scan_date': scan_date})
 
-            # Writing to JSON at every iteration incase it breaks
-        util.write_json(
-            hash_list, "{}/inputs/logs.json".format(FILE_PATH.parent))
+        # Writing to JSON at every iteration incase it breaks
+        if debug:
+            util.write_json(
+                hash_list, "{}/inputs/logs.json".format(FILE_PATH.parent))
 
     return hash_list
 
 
-def populate_ip(ip_list, vt_url):
+def populate_ip(ip_list, vt_url, debug=None):
     '''Populating ip_list of extra information'''
     # Loop through list and call API, can't chain values like populate_hash
     for value in ip_list:
@@ -155,13 +153,14 @@ def populate_ip(ip_list, vt_url):
                       'scan_date': scan_date})
 
         # Writing to JSON at every iteration incase it breaks
-        util.write_json(
-            ip_list, "{}/inputs/ip_logs.json".format(FILE_PATH.parent))
+        if debug:
+            util.write_json(
+                ip_list, "{}/inputs/ip_logs.json".format(FILE_PATH.parent))
 
     return ip_list
 
 
-def populate_domain(domain_list, vt_url):
+def populate_domain(domain_list, vt_url, debug=None):
     '''Populating domain_list of extra information'''
     # Loop through list and call API, can't chain values like populate_hash
     for domain in domain_list:
@@ -193,15 +192,19 @@ def populate_domain(domain_list, vt_url):
                            'positives': None, 'percent_score': None, 'scan_date': None})
 
         # Writing to JSON at every iteration incase it breaks
-        util.write_json(
-            domain_list, "{}/inputs/domain_logs.json".format(FILE_PATH.parent))
+        if debug:
+            util.write_json(
+                domain_list, "{}/inputs/domain_logs.json".format(FILE_PATH.parent))
 
     return domain_list
 
 
-def main():
-    '''main'''
-    hash_list, ip_list, domain_list = get_values()
+def populate_all(ioc_path=None):
+    '''Populating hash ip and domain list with VT info'''
+    file_path = ioc_path if ioc_path else '{}/inputs/ioc_list.json'.format(
+        FILE_PATH.parent)
+
+    hash_list, ip_list, domain_list = get_values(file_path)
     print("Populating domain information")
     updated_domain = populate_domain(
         domain_list, CONFIG['vt_domain'])
@@ -217,9 +220,16 @@ def main():
         new_json.append(row)
     for row in updated_hash:
         new_json.append(row)
+    return new_json
+
+
+def main():
+    '''main'''
+    new_json = populate_all()
     util.write_json(new_json, '{}/inputs/temp2.json'.format(FILE_PATH.parent))
     translator.convert_to_bulk_api('{}/inputs/temp2.json'.format(
         FILE_PATH.parent), '{}/inputs/ioc_list_final.json'.format(FILE_PATH.parent))
+    util.delete_file('{}/inputs/temp2.json'.format(FILE_PATH.parent))
 
 
 if __name__ == '__main__':
