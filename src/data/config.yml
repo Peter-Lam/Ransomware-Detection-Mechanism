@@ -14,3 +14,14 @@ api_key: [""]
 api_limit: 4
 # This api key is for ipinfo.io
 ip_api: ""
+bell_asn: {"577":"BACOM - Bell Canada",
+           "601":"BACOM4-AS - Bell Canada",
+           "602":"BACOM3-AS - Bell Canada",
+           "603":" BACOM2-AS - Bell Canada (Bell NHS)",
+           "6539":"GT-BELL - Bell Canada (Bell West)",
+           "11489":"BACI - Bell Canada (Bell Nexxia)",
+           "36522":"BELLMOBILITY-1 - BELL MOBILITY INC",
+           "40957":"BELLNHS - Bell Canada NHS",
+           "855":"CANET-ASN-4 - Bell Aliant Regional Communications",
+           "4390":"BELLATLANTIC-COM - Bell Atlantic, Inc.",
+           "53828":"BELL-MEDIA - CTV Television Network Limited"}
