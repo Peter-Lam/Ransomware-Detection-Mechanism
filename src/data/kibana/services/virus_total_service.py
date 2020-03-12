@@ -1,21 +1,30 @@
 #!/usr/bin/python
-'''This python script will update the existing ioc list to add more values for Kibana.'''
+'''This python script updates the existing ioc dictionary to add more values for Kibana.'''
 
 import time
 import pathlib
 import json
 import sys
 import requests
-sys.path.append('../')
-import json_translator as translator
+sys.path.append('../../')
 import utils.file_util as util
 FILE_PATH = pathlib.Path(__file__).parent.absolute()
-CONFIG = util.load_yaml('{}/config.yml'.format(FILE_PATH.parent))
+CONFIG = util.load_yaml('{}/config.yml'.format(FILE_PATH.parent.parent))
 
 
 def get_values(bulk_api_file_path):
-    '''Gather the values of returning lists of hashes, ips and urls'''
-    ioc_list = translator.convert_to_json(bulk_api_file_path)
+    '''
+    Read JSON and parse data into lists of hashes, ips and urls
+    :param bulk_api_file_path: Path to existing bulk api
+    :type bulk_api_file_path: str
+    :return hash_list: Returns the hash list of ioc data
+    :return ip_list: Returns the ip list of ioc data
+    :return domain_list: Returns the domain list of ioc data
+    :rtype hash_list: list of dict
+    :rtype ip_list: list of dict
+    :rtype domain_list: list of dict
+    '''
+    ioc_list = util.convert_to_json(bulk_api_file_path)
     hash_list = []
     ip_list = []
     domain_list = []
@@ -30,7 +39,17 @@ def get_values(bulk_api_file_path):
 
 
 def call_api(vt_url, resource_name, resource):
-    '''Calling the VirusTotal API and returns JSON'''
+    '''
+    Calling the VirusTotal API and returns JSON
+    :param vt_url: The url used for api call
+    :param resource_name: Name of resource used by VT API
+    :param resource: The resource itself (i.e. domain, ip, url)
+    :type vt_url: str
+    :type resource_name: str
+    :type resource: str
+    :return: JSON response from VT API
+    :rtype: json
+    '''
     counter = 0
     params = {'apikey': CONFIG['api_key'][0]}
     num_of_keys = len(CONFIG['api_key'])
@@ -61,7 +80,19 @@ def call_api(vt_url, resource_name, resource):
 
 
 def populate_hash(hash_list, vt_url, api_limit, debug=None):
-    '''Populating rows with hashes with missing data, returns lists of dicts of updated data'''
+    '''
+    Updates ioc hash dictionaries with VT data
+    :param hash_list: The list of hashes that need to be updated
+    :param vt_url: URL used for VT API call
+    :param api_limit: The API call limit of the API key, if public usually 4
+    :param debug: Debug mode option to add extra console logs
+    :type hash_list: list of dict
+    :type vt_url: str
+    :type api_limit: int
+    :type debug: bool, optional
+    :return hast_list: Returns updated hash information
+    :rtype hash_list: list of dict
+    '''
 
     hash_len = len(hash_list)
     # Loop through list, incrementing by api call limit each time
@@ -113,7 +144,18 @@ def populate_hash(hash_list, vt_url, api_limit, debug=None):
 
 
 def populate_ip(ip_list, vt_url, debug=None):
-    '''Populating ip_list of extra information'''
+    '''
+    Updates ioc ip dictionaries with VT data
+    :param ip_list: The list of ips that need to be updated
+    :param vt_url: URL used for VT API call
+    :param api_limit: The API call limit of the API key, if public usually 4
+    :param debug: Debug mode option to add extra console logs
+    :type ip_list: list of dict
+    :type vt_url: str
+    :type api_limit: int
+    :type debug: bool, optional
+    :return hast_list: Returns updated ip information
+    :rtype hash_list: list of dict'''
     # Loop through list and call API, can't chain values like populate_hash
     for value in ip_list:
         resource = value['value']
@@ -147,7 +189,7 @@ def populate_ip(ip_list, vt_url, debug=None):
                       'continent': continent,
                       'total_detected_urls': total_detected_urls, 'total': total,
                       'positives': positives, 'percent_score': percent,
-                      'scan_date': scan_date})
+                      'scan_date': latest_scan_date})
 
         # Writing to JSON at every iteration incase it breaks
         if debug:
@@ -158,7 +200,18 @@ def populate_ip(ip_list, vt_url, debug=None):
 
 
 def populate_domain(domain_list, vt_url, debug=None):
-    '''Populating domain_list of extra information'''
+    '''
+    Updates ioc populate_domain dictionaries with VT data
+    :param populate_domain: The list of domains that need to be updated
+    :param vt_url: URL used for VT API call
+    :param api_limit: The API call limit of the API key, if public usually 4
+    :param debug: Debug mode option to add extra console logs
+    :type populate_domain: list of dict
+    :type vt_url: str
+    :type api_limit: int
+    :type debug: bool, optional
+    :return hast_list: Returns updated domain information
+    :rtype hash_list: list of dict'''
     # Loop through list and call API, can't chain values like populate_hash
     for domain in domain_list:
         resource = (domain['value']).replace('[', '').replace(']', '').strip()
@@ -170,7 +223,7 @@ def populate_domain(domain_list, vt_url, debug=None):
             total_detected_urls = len(response["detected_urls"])
             total = 0
             positives = 0
-            latest_scan_date = ''
+            latest_scan_date = None
             # Going through all urls associated with the domain
             for row in response["detected_urls"]:
                 total += row["total"]
@@ -178,7 +231,7 @@ def populate_domain(domain_list, vt_url, debug=None):
                 scan_date = row["scan_date"]
                 if scan_date > latest_scan_date:
                     latest_scan_date = scan_date
-            percent = round((positives/total)*100, 2)
+            percent = round((positives/total)*100, 2) if total != 0 else 0
 
             # Updating dictionaries with new values
             domain.update({'is_valid': is_valid, 'total_detected_urls': total_detected_urls,
@@ -197,7 +250,11 @@ def populate_domain(domain_list, vt_url, debug=None):
 
 
 def populate_all(ioc_path=None):
-    '''Populating hash ip and domain list with VT info'''
+    '''
+    Updating hash, ip, and domain dictionaries with VT info
+    :param ioc_path: Path to bulk API json that will be updated
+    :type ioc_path: str, optional
+    '''
     file_path = ioc_path if ioc_path else '{}/inputs/ioc_list.json'.format(
         FILE_PATH.parent)
 
@@ -218,16 +275,3 @@ def populate_all(ioc_path=None):
     for row in updated_hash:
         new_json.append(row)
     return new_json
-
-
-def main():
-    '''main'''
-    new_json = populate_all()
-    util.write_json(new_json, '{}/inputs/temp2.json'.format(FILE_PATH.parent))
-    translator.convert_to_bulk_api('{}/inputs/temp2.json'.format(
-        FILE_PATH.parent), '{}/inputs/ioc_list_final.json'.format(FILE_PATH.parent))
-    util.delete_file('{}/inputs/temp2.json'.format(FILE_PATH.parent))
-
-
-if __name__ == '__main__':
-    main()

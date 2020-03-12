@@ -1,16 +1,14 @@
 #!/usr/bin/python
 '''
-This service utilizes ipinfo and cymru APIs to update IP and Domains 
+This service utilizes ipinfo and cymru APIs to update IP and Domains
 with geolocation and asn information
 '''
-import pyasn
 import pathlib
-import requests
 import socket
-# https://www.team-cymru.com/IP-ASN-mapping.html
-from cymruwhois import Client
 import sys
 import ipinfo
+# https://www.team-cymru.com/IP-ASN-mapping.html
+from cymruwhois import Client
 sys.path.append('../../')
 import utils.file_util as util
 
@@ -88,7 +86,7 @@ def get_geo_mapping(ip_list):
     :param ip_list: A list of ips to get geolocation information from
     :type ip_list: list of str
     :return mapping: Returns a dictionary with key value pairs of (ip:geo_info)
-    :rtype mapping: dict    
+    :rtype mapping: dict
     '''
     mapping = {}
     # Calling ipinfo with given api key, returning handler
@@ -125,8 +123,8 @@ def merge_mappings(main_dict, second_dict):
     :rtype result_mapping: dict
     '''
     result_mapping = {}
-    for k, v in main_dict.items():
-        result_mapping.update({k: second_dict.get(v)})
+    for key, val in main_dict.items():
+        result_mapping.update({key: second_dict.get(val)})
     return result_mapping
 
 
@@ -170,7 +168,7 @@ def update_asn_info(list_of_dicts, ioc_type):
     :type list_of_dicts: list of dict
     :type ioc_type: str
     :return: Returns the updated dictionary of IOCs
-    :rtype: list of dict    
+    :rtype: list of dict
     '''
     value_list = []
     # Validating ioc_type

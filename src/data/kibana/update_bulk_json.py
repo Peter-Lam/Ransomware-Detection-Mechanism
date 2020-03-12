@@ -6,15 +6,15 @@ import argparse
 import os.path as path
 import pathlib
 import sys
-import socket
-import json
 from distutils.util import strtobool
 from urllib.parse import urlparse
 sys.path.append('../')
-from ip_info_service import ip_info_service
-import update_virus_total_data as vt_updater
-import json_translator as translator
+import utils.validator as validator
 import utils.file_util as util
+import utils.common as common
+import kibana.services.virus_total_service as vt_updater
+import kibana.services.ip_info_service as ip_updater
+
 # Declaring globals
 FILE_PATH = pathlib.Path(__file__).parent.absolute()
 # Holds VT API information
@@ -32,7 +32,7 @@ def argparser():
                             (e.g. C:/GitHub-Projects/Ransomware-Detection-Mechanism/ioc_list.json',
                        action='store')
     group.add_argument('-update', '--update', dest='existing_path', metavar='',
-                       help='updates the existing BULK api json file\
+                       help='appends the existing BULK api json file with new data\
                             (e.g. C:/GitHub-Projects/Ransomware-Detection-Mechanism/ioc_list.json',
                        action='store')
     parser.add_argument('-text', '--text', dest='values_path', metavar='',
@@ -70,41 +70,18 @@ def argparser():
     return args
 
 
-def is_valid_ip(value):
-    '''Validating ip'''
-    try:
-        socket.inet_aton(value)
-        return True
-    except socket.error:
-        # Not legal
-        print(f"The following ip is not valid, skipping: {value}")
-        return False
-
-
-def is_valid_md5(value):
-    '''Validating hash'''
-    if len(value) == 32:
-        return True
-    print(
-        f"The following MD5 is not the proper format: {value},\
-            did you mean another hash type? ")
-    return False
-
-
-def is_valid_sha256(value):
-    '''Validating hash'''
-    if len(value) == 64:
-        return True
-    print(
-        f"The following SHA256 is not the proper format: {value},\
-            did you mean another hash type? ")
-    return False
-
-
-def parse_url_list(url_list):
-    '''Breaking URL for query, path, filename, domain'''
+def parse_url_dict(url_list, url_type):
+    '''
+    Breaking URL for query, path, filename, domain
+    :param url_list: list of urls to parse
+    :param url_type: the type of url being passed could be the value or source
+    :type url_list: list of dict
+    :type url_type: str
+    :return: returns an updated dictionary with parsed url as new values
+    :rtype: list of dict
+    '''
     for url_dict in url_list:
-        url = url_dict['value'].replace('[', '').replace(']', '').strip()
+        url = url_dict[url_type].replace('[', '').replace(']', '').strip()
         if "://" not in url:
             url = f"http://{url}"
             parsed = urlparse(url)
@@ -123,17 +100,26 @@ def parse_url_list(url_list):
         if url_file_ext == "":
             url_filename = ""
 
-        url_dict.update({'url_query': url_query,
-                         'url_path': url_path,
-                         'url_filename': url_filename,
-                         'url_file_ext': url_file_ext,
-                         'url_scheme': url_scheme,
-                         'url_hostname': url_hostname,
-                         'url_domain': url_domain})
+        url_dict.update({url_type+'_url_query': url_query,
+                         url_type + '_url_path': url_path,
+                         url_type + '_url_filename': url_filename,
+                         url_type + '_url_file_ext': url_file_ext,
+                         url_type + '_url_scheme': url_scheme,
+                         url_type + '_url_hostname': url_hostname,
+                         url_type + '_url_domain': url_domain})
     return url_list
 
+
 def call_apis(list_values, ioc_type):
-    '''Calling VT and IPInfor APIS and updating values'''
+    '''
+    Calling VT, IPInfo, Cymru APIS to updating values to ioc dict
+    :param list_values: the list of ioc dictionaries to update
+    :param ioc_type: the type of ioc (i.e. domain, md5, sha256, ip, url)
+    :type list_values: list of dict
+    :type ioc_type: str
+    :return updated_values: returns updated api information
+    :rtype: list of dict
+    '''
     if len(list_values) == 0:
         print("No valid values found, closing program")
         sys.exit()
@@ -142,87 +128,87 @@ def call_apis(list_values, ioc_type):
         updated_values = vt_updater.populate_hash(
             list_values, CONFIG['vt_report'], CONFIG['api_limit'])
     elif ioc_type == 'IP':
-        print("Populating ip information  from Virus Total...")
+        print("Populating ip information from Virus Total...")
         vt_updated_values = vt_updater.populate_ip(
             list_values, CONFIG['vt_ip'])
-        print("Propulating ip information from IPInfo")
-        updated_values = ip_info_service(CONFIG['ip_api'], vt_updated_values)
+        print("Populating ip information from IPInfo and Cymru")
+        updated_values = ip_updater.update_all(vt_updated_values, ioc_type)
     elif ioc_type in ('URL', 'DOMAIN'):
         print("Populating domain information from Virus Total...")
-        # updated_values = vt_updater.populate_domain(
-        # base_info, CONFIG['vt_domain'])
+        updated_values = vt_updater.populate_domain(
+            list_values, CONFIG['vt_domain'])
         if ioc_type == 'URL':
-            updated_values = parse_url_list(list_values)
+            updated_values = parse_url_dict(updated_values, 'value')
+        if ioc_type == 'DOMAIN':
+            updated_values = ip_updater.update_all(updated_values, ioc_type)
     else:
         updated_values = list_values
     return updated_values
-def main():
-    '''main'''
-    args = argparser()
-    # Declaring variables
-    ioc_type = (args.ioc)[0]
-    list_to_push, list_values, base_info = [], [], []
-    current_index = None
-    # If --update was chosen then set appropriate values
-    if args.existing_path:
-        ioc_file = args.existing_path
-        is_new_file = False
-    else:
-        ioc_file = args.new_path
-        is_new_file = True
 
-    # Read text file and grabbing a list of values
-    list_values = util.load_file(args.values_path)
 
+def set_basic_info(list_values, ioc_type, malware, source):
+    '''
+    Setting basic ioc information based on cmd arguments
+    returning a list of dictionaries containing type, value, malware, and source
+    :param list_values: list of values
+    :param ioc_type: type of ioc (i.e. md5, sha256, ip, domain, url)
+    :param malware: type of malware (i.e. emotet, ryuk, trickbot)
+    :param source: source url where iocs were posted (i.e. pastebin, twitter)
+    :type list_values: list
+    :type ioc_type: string
+    :type malware: string
+    :type source: string
+    :return baseinfo: returns a list of dictionaries containing type, value, malware, and source
+    :rtype: list of dict
+    '''
+    base_info = []
     # Loop through and add basic ioc information from args
     for value in list_values:
         # Only remove [] from IP but not others, like urls and domain to prevent accidental clicks
         if ioc_type == 'IP':
-            resource = value.replace('[', '').replace(']', '').strip()
-            # If the ip is not valid then skipping
-            if not is_valid_ip(resource):
+            resource = common.strip_brackets(value)
+            # If the ip is not valid, print warning and skip this value
+            if not validator.is_valid_ip(resource):
                 continue
         else:
+            # If the ioc type is a hash but not a validone, print a warning and skip it
             resource = value.strip()
-            if ioc_type == 'MD5' and not is_valid_md5(resource):
+            if ioc_type == 'MD5' and not validator.is_valid_md5(resource):
                 continue
-            if ioc_type == 'SHA256' and not is_valid_sha256(resource):
+            if ioc_type == 'SHA256' and not validator.is_valid_sha256(resource):
                 continue
         base_info.append({'type': ioc_type, 'value': resource,
-                          'malware': (args.malware).lower(), 'source': args.source})
+                          'malware': malware, 'source': source})
+    return parse_url_dict(base_info, 'source')
 
-    # Call Virus Total and IPInfo API to get missing data
-    updated_values = call_apis(base_info, ioc_type)
 
+def main():
+    '''main'''
+    args = argparser()
+
+    # Read text file and grabbing a list of values
+    list_values = util.load_file(args.values_path)
+
+    # Set the basic info given by args
+    base_info = set_basic_info(
+        list_values, args.ioc[0], args.malware.lower(), args.source)
+
+    # Populate missing data with various apis
+    updated_values = call_apis(base_info, args.ioc[0])
+
+    # If updating file, read JSON file to find the last index and insert the new values
+    if args.existing_path:
+        print("Updating existing JSON...")
+        ioc_file = args.existing_path
+        util.update_bulk_api(updated_values, ioc_file)
+
+        print(f"BulkAPI JSON Updated at: {ioc_file}")
     # If its a new file, then create and write to a new file
-    if is_new_file:
-        # Creating a temporary json and then converting to bulk api format
-        util.write_json(
-            updated_values, '{}/inputs/temp.json'.format(FILE_PATH.parent))
-        translator.convert_to_bulk_api('{}/inputs/temp.json'.format(
-            FILE_PATH.parent), ioc_file, silent=True)
-        util.delete_file('{}/inputs/temp.json'.format(FILE_PATH.parent))
-        print(f"New file has been created at: {ioc_file}")
-    # Otherwise updating file, read JSON file to find the last index and insert the new values
     else:
-        # Opening existing file
-        with open(ioc_file) as file:
-            lines = file.read().splitlines()
-            last_index = (json.loads(lines[-2]))["index"]["_id"]
-            current_index = last_index + 1
-        # For every value in the list, add the attributes into the JSON
-        for value in updated_values:
-            list_to_push.append(
-                "{\"index\":{\"_index\":\"ioc\",\"_id\":%d}}" % current_index)
-            list_to_push.append(json.dumps(value))
-            current_index += 1
-
-        # Write to the JSON file
-        with open(ioc_file, "a") as file:
-            for line in list_to_push:
-                file.write(line + "\n")
-
-        print("BulkAPI JSON Updated!")
+        print("Writing to new JSON...")
+        ioc_file = args.new_path
+        util.write_bulk_api(updated_values, ioc_file)
+        print(f"New file has been created at: {ioc_file}")
 
 
 if __name__ == "__main__":
