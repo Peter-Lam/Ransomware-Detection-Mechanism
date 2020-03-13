@@ -30,23 +30,30 @@ def make_preprocess():
     # Registered ports are 1024 to 49151
     # Dynamic ports (also called private ports) are 49152 to 65535
     port_bins = [0, 1023, 49151, 65535]
-    labels = [1, 2, 3]
+    s_labels = ['sis_known_port', 'sis_reg_port', 'sis_dyn_port']
+    d_labels = ['dis_known_port', 'dis_reg_port', 'dis_dyn_port']
 
     interim_df = pd.read_csv(interim_output_path,
                              sep=',',
                              escapechar='\\')
-    interim_df['StartTime'] = pd.to_datetime(interim_df['StartTime'])
+    preprocessed_df = interim_df
+    preprocessed_df['StartTime'] = pd.to_datetime(preprocessed_df['StartTime'])
 
-    interim_df['Sport_bin'] = pd.cut(interim_df['Sport'], bins=port_bins,
-                                     labels=labels, include_lowest=True)
+    s_port_series = pd.cut(preprocessed_df['Sport'], bins=port_bins,
+                           labels=s_labels, include_lowest=True)
 
-    interim_df['Dport_bin'] = pd.cut(interim_df['Dport'], bins=port_bins,
-                                     labels=labels, include_lowest=True)
+    d_port_series = pd.cut(preprocessed_df['Dport'], bins=port_bins,
+                           labels=d_labels, include_lowest=True)
 
-    interim_df['is_fwd'] = interim_df['Sport']
-    interim_df.loc[interim_df['Sport'] >= 1024, 'is_fwd'] = 1
-    interim_df.loc[interim_df['Sport'] < 1024, 'is_fwd'] = 0
+    preprocessed_df['is_fwd'] = preprocessed_df['Sport']
+    preprocessed_df.loc[preprocessed_df['Sport'] >= 1024, 'is_fwd'] = 1
+    preprocessed_df.loc[preprocessed_df['Sport'] < 1024, 'is_fwd'] = 0
 
-    preprocessed_df = interim_df.copy()
+    preprocessed_df = preprocessed_df.join(pd.get_dummies(preprocessed_df['Proto']))
+    preprocessed_df = preprocessed_df.join(pd.get_dummies(s_port_series))
+    preprocessed_df = preprocessed_df.join(pd.get_dummies(preprocessed_df['Dir']))
+    preprocessed_df = preprocessed_df.join(pd.get_dummies(d_port_series))
+    preprocessed_df = preprocessed_df.join(pd.get_dummies(preprocessed_df['State']))
+
     makedirs(dirname(preprocessed_output_path), exist_ok=True)
     preprocessed_df.to_csv(preprocessed_output_path, index=False)
