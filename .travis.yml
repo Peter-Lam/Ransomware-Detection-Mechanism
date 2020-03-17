@@ -6,7 +6,9 @@ install:
   - pip install -r ./requirements.txt
 # command to run tests
 script:
+  - pylint ./src/data/make_dataset.py
   - pylint ./src/data/kibana/
   - pylint ./src/data/scripts/
-  - pylint ./src/data/utils/
+  - pylint ./src/visualization/
+  - pylint ./src/utils/
   - ./travis_build.sh

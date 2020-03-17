@@ -6,10 +6,14 @@
 from os import makedirs
 from os.path import dirname
 
-import numpy as np
+import sys
 import pandas as pd
 
+sys.path.append('../')
 from utils.file_util import load_yaml
+
+#Global
+CONFIG_PATH = './config.yml'
 
 def main():
     '''main'''
@@ -19,36 +23,42 @@ def make_preprocess():
     '''
         Read interim.csv and clean more data.
         1. Read StartTime as DateTime
-        2. Replace null values for sTos and dTos with -1
-        3. Perform adaptive binning on sTos and use same
-            bin for dTos (8-Quartile)
-        4. Apply natural log on TotPkts, TotBytes, SrcBytes columns
-            to remove skewing
-        5. Write to preproccessed.csv
+        2. Perform binning on source and destination ports
+        3. Add attribute indicating direction of flow
+        4. Write to preproccessed.csv
     '''
-    config = load_yaml('./config.yml')
+    config = load_yaml(CONFIG_PATH)
     interim_output_path = config['interim_output_path']
     preprocessed_output_path = config['preprocessed_output_path']
-    quantile_list = [0, .125, .25, .375, .5, .625, .75, .875, 1.]
-    labels = [1, 2, 3, 4, 5, 6, 7, 8]
+
+    # Well-known ports range from 0 through 1023
+    # Registered ports are 1024 to 49151
+    # Dynamic ports (also called private ports) are 49152 to 65535
+    port_bins = [0, 1023, 49151, 65535]
+    s_labels = ['sis_known_port', 'sis_reg_port', 'sis_dyn_port']
+    d_labels = ['dis_known_port', 'dis_reg_port', 'dis_dyn_port']
+
     interim_df = pd.read_csv(interim_output_path,
-                             sep=',', engine='python', escapechar='\\')
-    interim_df['StartTime'] = pd.to_datetime(interim_df['StartTime'])
-    interim_df.loc[interim_df['sTos'].replace('', np.nan).isnull(), 'sTos'] = -1
-    interim_df.loc[interim_df['dTos'].replace('', np.nan).isnull(), 'dTos'] = -1
-    bins_src_port = interim_df['Sport'].quantile(quantile_list)
+                             sep=',',
+                             escapechar='\\')
+    preprocessed_df = interim_df
+    preprocessed_df['StartTime'] = pd.to_datetime(preprocessed_df['StartTime'])
 
-    interim_df['Sport'] = pd.cut(interim_df['Sport'], bins=bins_src_port,
-                                 labels=labels, include_lowest=True)
+    s_port_series = pd.cut(preprocessed_df['Sport'], bins=port_bins,
+                           labels=s_labels, include_lowest=True)
 
-    interim_df['Dport'] = pd.cut(interim_df['Dport'], bins=bins_src_port,
-                                 labels=labels, include_lowest=True)
+    d_port_series = pd.cut(preprocessed_df['Dport'], bins=port_bins,
+                           labels=d_labels, include_lowest=True)
 
-    for col in ['Sport', 'Dport']:
-        interim_df[col] = interim_df[col].astype('int64')
-    for col in ['TotPkts', 'TotBytes', 'SrcBytes']:
-        interim_df[col] = np.log((1 + interim_df[col]))
+    preprocessed_df['is_fwd'] = preprocessed_df['Sport']
+    preprocessed_df.loc[preprocessed_df['Sport'] >= 1024, 'is_fwd'] = 1
+    preprocessed_df.loc[preprocessed_df['Sport'] < 1024, 'is_fwd'] = 0
 
-    preprocessed_df = interim_df.copy()
+    preprocessed_df = preprocessed_df.join(pd.get_dummies(preprocessed_df['Proto']))
+    preprocessed_df = preprocessed_df.join(pd.get_dummies(s_port_series))
+    preprocessed_df = preprocessed_df.join(pd.get_dummies(preprocessed_df['Dir']))
+    preprocessed_df = preprocessed_df.join(pd.get_dummies(d_port_series))
+    preprocessed_df = preprocessed_df.join(pd.get_dummies(preprocessed_df['State']))
+
     makedirs(dirname(preprocessed_output_path), exist_ok=True)
     preprocessed_df.to_csv(preprocessed_output_path, index=False)

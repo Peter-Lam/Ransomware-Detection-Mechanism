@@ -6,15 +6,20 @@
 
 import os
 import time
+import sys
 import urllib3
 import requests
 
+sys.path.append('../')
 from utils.file_util import load_json, load_yaml
+
+#Global
+CONFIG_PATH = './config.yml'
 
 def main():
     '''Retrieves dataset_json and sends request to get the bi netflow
     for each object'''
-    config = load_yaml('./config.yml')
+    config = load_yaml(CONFIG_PATH)
     json_path = config['dataset_path']
     output_base_path = config['binet_output_path']
     dataset_json = get_dataset_json(json_path)

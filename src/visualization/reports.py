@@ -3,7 +3,6 @@
     This is a python program will create preproccesed.csv
 '''
 
-import numpy as np
 import pandas as pd
 import matplotlib
 from pandas_profiling import ProfileReport
@@ -32,8 +31,6 @@ def create_report_interim(data_f, minimal_report, out_path):
         values be replaced with -1 if empty string.
     '''
     data_f['StartTime'] = pd.to_datetime(data_f['StartTime'])
-    data_f.loc[data_f['sTos'].replace('', np.nan).isnull(), 'sTos'] = -1
-    data_f.loc[data_f['dTos'].replace('', np.nan).isnull(), 'dTos'] = -1
     profile = ProfileReport(data_f,
                             minimal=minimal_report,
                             title='Full Interim Profiling Report (With Skew)',
@@ -63,26 +60,3 @@ def type_of_report(minimal_report):
 
 if __name__ == '__main__':
     main()
-
-# def others():
-#     quantile_list = [0, .125, .25, .375, .5, .625, .75, .875, 1.]
-#     labels = [1, 2, 3, 4, 5, 6, 7, 8]
-
-    # for col in ['State', 'Dir', 'Proto', 'Label']:
-    #     df[col] = df[col].astype('category')
-
-    # df.set_index('StartTime')
-    # df['StartTime'] = df['StartTime'].apply(lambda x: x[:19])
-
-    # bins_src_port = df['Sport'].quantile(quantile_list)
-    # df['Sport'] = pd.cut(df['Sport'], bins=bins_src_port, labels=labels, include_lowest=True)
-
-    # bins_dst_port = df['Dport'].quantile([0, .5, 1.])
-    # df['Dport'] = pd.cut(df['Dport'], bins=bins_src_port, labels=labels, include_lowest=True)
-
-    # for col in ['Sport', 'Dport']:
-    #     df[col] = df[col].astype('int64')
-
-    # df_new = df.copy()
-    # for col in ['TotPkts', 'TotBytes', 'SrcBytes']:
-    #     df_new[col] = np.log((1 + df_new[col]))
