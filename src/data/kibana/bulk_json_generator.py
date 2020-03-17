@@ -1,7 +1,8 @@
 #!/usr/bin/python
 '''This is a python program which is used to automate the process of
-updating ioc JSON file with the appropriate values'''
-
+appending or creating a new ioc JSON file with the appropriate values'''
+import requests
+import socket
 import argparse
 import os.path as path
 import pathlib
@@ -24,7 +25,7 @@ CONFIG = util.load_yaml('{}/config.yml'.format(FILE_PATH.parent))
 def argparser():
     '''Parses the user arguments and checks path correct paths'''
     parser = argparse.ArgumentParser(
-        description="update_json - Updating existing json files with more datasets")
+        description="Appending or creating new json files with new information")
     # Making new file and update file mutually exclusive options
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-new', '--new', dest='new_path', metavar='',
@@ -52,7 +53,7 @@ def argparser():
     args = parser.parse_args()
     # Checking validity pf paths
     if args.existing_path and not path.exists(args.existing_path):
-        parser.error("The file %s does not exist!" % args.existing_path)
+        parser.error(f"The file {args.existing_path} does not exist!")
     if args.new_path and path.exists(args.new_path):
         answer = input(
             "The destination path already exists at: \
@@ -66,7 +67,7 @@ def argparser():
             parser.error("Invalid answer, please select 'Y' or 'N' next time")
 
     if not path.exists(args.values_path):
-        parser.error("The file %s does not exist!" % args.values_path)
+        parser.error(f"The file {args.values_path} does not exist!")
     return args
 
 
@@ -81,32 +82,36 @@ def parse_url_dict(url_list, url_type):
     :rtype: list of dict
     '''
     for url_dict in url_list:
-        url = url_dict[url_type].replace('[', '').replace(']', '').strip()
-        if "://" not in url:
-            url = f"http://{url}"
-            parsed = urlparse(url)
-            url_scheme = None
-        else:
-            parsed = urlparse(url)
-            url_scheme = parsed.scheme
-        url_query = parsed.query
-        url_path = parsed.path
-        url_domain = parsed.netloc
-        url_hostname = parsed.hostname
-        url_filename = pathlib.Path(url).stem
-        url_file_ext = pathlib.Path(url).suffix
-        if url_file_ext in url_filename or url_file_ext in url_domain:
-            url_file_ext = ""
-        if url_file_ext == "":
-            url_filename = ""
+        try:
+            url = url_dict[url_type].replace('[', '').replace(']', '').strip()
+            if "://" not in url:
+                url = f"http://{url}"
+                parsed = urlparse(url)
+                url_scheme = None
+            else:
+                parsed = urlparse(url)
+                url_scheme = parsed.scheme
+            url_query = parsed.query
+            url_path = parsed.path
+            url_domain = parsed.netloc
+            url_hostname = parsed.hostname
+            url_filename = pathlib.Path(url).stem
+            url_file_ext = pathlib.Path(url).suffix
+            if url_file_ext in url_filename or url_file_ext in url_domain:
+                url_file_ext = ""
+            if url_file_ext == "":
+                url_filename = ""
 
-        url_dict.update({url_type+'_url_query': url_query,
-                         url_type + '_url_path': url_path,
-                         url_type + '_url_filename': url_filename,
-                         url_type + '_url_file_ext': url_file_ext,
-                         url_type + '_url_scheme': url_scheme,
-                         url_type + '_url_hostname': url_hostname,
-                         url_type + '_url_domain': url_domain})
+            url_dict.update({url_type+'_url_query': url_query,
+                            url_type + '_url_path': url_path,
+                            url_type + '_url_filename': url_filename,
+                            url_type + '_url_file_ext': url_file_ext,
+                            url_type + '_url_scheme': url_scheme,
+                            url_type + '_url_hostname': url_hostname,
+                            url_type + '_url_domain': url_domain})
+        except Exception as e:
+            print(e)
+            print(url_dict)
     return url_list
 
 
@@ -121,26 +126,24 @@ def call_apis(list_values, ioc_type):
     :rtype: list of dict
     '''
     if len(list_values) == 0:
-        print("No valid values found, closing program")
-        sys.exit()
-    if ioc_type in ('MD5', 'SHA256'):
-        print("Populating hash information from Virus Total...")
+        # print(f"No valid values found for ioc type: '{ioc_type}', not calling api")
+        updated_values = None
+    elif ioc_type in ('MD5', 'SHA256'):
         updated_values = vt_updater.populate_hash(
             list_values, CONFIG['vt_report'], CONFIG['api_limit'])
     elif ioc_type == 'IP':
-        print("Populating ip information from Virus Total...")
         vt_updated_values = vt_updater.populate_ip(
             list_values, CONFIG['vt_ip'])
-        print("Populating ip information from IPInfo and Cymru")
-        updated_values = ip_updater.update_all(vt_updated_values, ioc_type)
+        print("Gathering ip information from IPInfo and Cymru")
+        updated_values = []
+        for num in range(0, len(list_values), 100):
+            updated_values += ip_updater.update_all(vt_updated_values[num:num+100], ioc_type)
     elif ioc_type in ('URL', 'DOMAIN'):
-        print("Populating domain information from Virus Total...")
-        updated_values = vt_updater.populate_domain(
+        vt_updated_values = vt_updater.populate_domain(
             list_values, CONFIG['vt_domain'])
-        if ioc_type == 'URL':
-            updated_values = parse_url_dict(updated_values, 'value')
-        if ioc_type == 'DOMAIN':
-            updated_values = ip_updater.update_all(updated_values, ioc_type)
+        print(f"Gathering {ioc_type} information from IPInfo and Cymru")
+        ip_updated_values = ip_updater.update_all(vt_updated_values, ioc_type)
+        updated_values = parse_url_dict(ip_updated_values, 'value')
     else:
         updated_values = list_values
     return updated_values

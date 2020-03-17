@@ -6,37 +6,11 @@ import pathlib
 import json
 import sys
 import requests
+from datetime import datetime
 sys.path.append('../../')
 import utils.file_util as util
 FILE_PATH = pathlib.Path(__file__).parent.absolute()
 CONFIG = util.load_yaml('{}/config.yml'.format(FILE_PATH.parent.parent))
-
-
-def get_values(bulk_api_file_path):
-    '''
-    Read JSON and parse data into lists of hashes, ips and urls
-    :param bulk_api_file_path: Path to existing bulk api
-    :type bulk_api_file_path: str
-    :return hash_list: Returns the hash list of ioc data
-    :return ip_list: Returns the ip list of ioc data
-    :return domain_list: Returns the domain list of ioc data
-    :rtype hash_list: list of dict
-    :rtype ip_list: list of dict
-    :rtype domain_list: list of dict
-    '''
-    ioc_list = util.convert_to_json(bulk_api_file_path)
-    hash_list = []
-    ip_list = []
-    domain_list = []
-    for ioc in ioc_list:
-        if (json.loads(ioc))["type"] == "MD5" or (json.loads(ioc))["type"] == "SHA256":
-            hash_list.append((json.loads(ioc)))
-        if (json.loads(ioc))["type"] == "IP":
-            ip_list.append((json.loads(ioc)))
-        if (json.loads(ioc))["type"] == "DOMAIN":
-            domain_list.append((json.loads(ioc)))
-    return hash_list, ip_list, domain_list
-
 
 def call_api(vt_url, resource_name, resource):
     '''
@@ -93,7 +67,7 @@ def populate_hash(hash_list, vt_url, api_limit, debug=None):
     :return hast_list: Returns updated hash information
     :rtype hash_list: list of dict
     '''
-
+    print("Gathering hash information from Virus Total...")
     hash_len = len(hash_list)
     # Loop through list, incrementing by api call limit each time
     for num in range(0, hash_len, api_limit):
@@ -156,6 +130,7 @@ def populate_ip(ip_list, vt_url, debug=None):
     :type debug: bool, optional
     :return hast_list: Returns updated ip information
     :rtype hash_list: list of dict'''
+    print("Gathering ip information from Virus Total...")
     # Loop through list and call API, can't chain values like populate_hash
     for value in ip_list:
         resource = value['value']
@@ -169,6 +144,7 @@ def populate_ip(ip_list, vt_url, debug=None):
             total = 0
             positives = 0
             latest_scan_date = ''
+            first_scan_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             # Going through all urls associated with the domain
             for row in response["detected_urls"]:
                 total += row["total"]
@@ -176,12 +152,15 @@ def populate_ip(ip_list, vt_url, debug=None):
                 scan_date = row["scan_date"]
                 if scan_date > latest_scan_date:
                     latest_scan_date = scan_date
+                if scan_date < first_scan_date:
+                    first_scan_date = scan_date
             percent = round((positives/total)*100, 2)
         else:
             total = None
             positives = None
             percent = None
             latest_scan_date = None
+            first_scan_date = None
             total_detected_urls = 0
 
         # Updating dictionaries with new values
@@ -189,7 +168,7 @@ def populate_ip(ip_list, vt_url, debug=None):
                       'continent': continent,
                       'total_detected_urls': total_detected_urls, 'total': total,
                       'positives': positives, 'percent_score': percent,
-                      'scan_date': latest_scan_date})
+                      'lastest_scan_date': latest_scan_date, 'first_scan_date': first_scan_date})
 
         # Writing to JSON at every iteration incase it breaks
         if debug:
@@ -213,6 +192,7 @@ def populate_domain(domain_list, vt_url, debug=None):
     :return hast_list: Returns updated domain information
     :rtype hash_list: list of dict'''
     # Loop through list and call API, can't chain values like populate_hash
+    print("Gathering domain information from Virus Total...")
     for domain in domain_list:
         resource = (domain['value']).replace('[', '').replace(']', '').strip()
         # Call VT Api
@@ -223,7 +203,8 @@ def populate_domain(domain_list, vt_url, debug=None):
             total_detected_urls = len(response["detected_urls"])
             total = 0
             positives = 0
-            latest_scan_date = None
+            latest_scan_date = ''
+            first_scan_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             # Going through all urls associated with the domain
             for row in response["detected_urls"]:
                 total += row["total"]
@@ -231,15 +212,17 @@ def populate_domain(domain_list, vt_url, debug=None):
                 scan_date = row["scan_date"]
                 if scan_date > latest_scan_date:
                     latest_scan_date = scan_date
+                if scan_date < first_scan_date:
+                    first_scan_date = scan_date
             percent = round((positives/total)*100, 2) if total != 0 else 0
 
             # Updating dictionaries with new values
             domain.update({'is_valid': is_valid, 'total_detected_urls': total_detected_urls,
                            'total': total, 'positives': positives, 'percent_score': percent,
-                           'scan_date': latest_scan_date})
+                           'latest_scan_date': latest_scan_date, 'first_scan_date': first_scan_date})
         else:
             domain.update({'is_valid': is_valid, 'total': None,
-                           'positives': None, 'percent_score': None, 'scan_date': None})
+                           'positives': None, 'percent_score': None, 'latest_scan_date': None, 'first_scan_date': None})
 
         # Writing to JSON at every iteration incase it breaks
         if debug:
@@ -247,31 +230,3 @@ def populate_domain(domain_list, vt_url, debug=None):
                 domain_list, "{}/inputs/domain_logs.json".format(FILE_PATH.parent))
 
     return domain_list
-
-
-def populate_all(ioc_path=None):
-    '''
-    Updating hash, ip, and domain dictionaries with VT info
-    :param ioc_path: Path to bulk API json that will be updated
-    :type ioc_path: str, optional
-    '''
-    file_path = ioc_path if ioc_path else '{}/inputs/ioc_list.json'.format(
-        FILE_PATH.parent)
-
-    hash_list, ip_list, domain_list = get_values(file_path)
-    print("Populating domain information")
-    updated_domain = populate_domain(
-        domain_list, CONFIG['vt_domain'])
-    print("Populating ip information")
-    updated_ip = populate_ip(ip_list, CONFIG['vt_ip'])
-    print("Populating hash information (this may take a while)")
-    updated_hash = populate_hash(
-        hash_list, CONFIG['vt_report'], CONFIG['api_limit'])
-    new_json = []
-    for row in updated_domain:
-        new_json.append(row)
-    for row in updated_ip:
-        new_json.append(row)
-    for row in updated_hash:
-        new_json.append(row)
-    return new_json

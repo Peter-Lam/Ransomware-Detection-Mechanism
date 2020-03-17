@@ -6,10 +6,12 @@ with geolocation and asn information
 import pathlib
 import socket
 import sys
+import time
 import ipinfo
 # https://www.team-cymru.com/IP-ASN-mapping.html
 from cymruwhois import Client
 sys.path.append('../../')
+import utils.common as common
 import utils.file_util as util
 
 FILE_PATH = pathlib.Path(__file__).parent.absolute()
@@ -38,7 +40,11 @@ def domain_to_asn(domain_list):
     :rtype: dict
     '''
     ip_list, domain_ip_mapping = domain_to_ip(domain_list)
-    ip_asn_mapping = get_asn_mapping(ip_list)
+    # Removing unresolved ips
+    stripped_ips = [i for i in ip_list if i] 
+    ip_asn_mapping = get_asn_mapping(stripped_ips)
+    # Adding empty mapping for unresolved ips
+    ip_asn_mapping.update({None:{'asn': None, 'is_bell': None}})
     return merge_mappings(domain_ip_mapping, ip_asn_mapping)
 
 
@@ -57,9 +63,15 @@ def domain_to_ip(domain_list):
     domain_ip_mapping = {}
     # Get the ips from domain name
     for domain in domain_list:
-        ip_value = socket.gethostbyname(domain)
-        domain_ip_mapping.update({domain: ip_value})
-        ip_list.append(ip_value)
+        try:
+            clean_domain = common.strip_brackets(domain)
+            ip_value = socket.gethostbyname(clean_domain)
+        except socket.gaierror as e:
+            print(f"Unable to find IP for domain {clean_domain}, skipping")
+            ip_value = None
+        finally:
+            domain_ip_mapping.update({domain: ip_value})
+            ip_list.append(ip_value)
     return ip_list, domain_ip_mapping
 
 
@@ -73,11 +85,33 @@ def get_asn_mapping(ip_list):
     '''
     mapping = {}
     client = Client()
-    for idx, result in enumerate(client.lookupmany(ip_list)):
-        is_bell = result.asn in CONFIG['bell_asn'].keys()
-        mapping.update(
-            {ip_list[idx]: {'asn': int(result.asn), 'is_bell': is_bell}})
-    return mapping
+    temp = 0
+    try:
+        # If the length of the list is 1, do a solo api call
+        if len(ip_list) == 1:
+            # Incase the api call returns special characters, catch error and set none
+            try:
+                result = client.lookup(ip_list[0])
+                is_bell = result.asn in CONFIG['bell_asn'].keys()
+                mapping.update(
+                    {ip_list[0]: {'asn': result.asn, 'is_bell': is_bell}})
+                return mapping
+            except UnicodeDecodeError:
+                mapping.update(
+                    {ip_list[0]: {'asn': None, 'is_bell': None}})
+                return mapping
+        for idx, result in enumerate(client.lookupmany(ip_list)):
+            is_bell = result.asn in CONFIG['bell_asn'].keys()
+            mapping.update(
+                {ip_list[idx]: {'asn': result.asn, 'is_bell': is_bell}})
+        return mapping
+    except UnicodeDecodeError:
+        # Split list and recall function to find invalid api call and rejoin
+        mapping_a = get_asn_mapping(ip_list[:len(ip_list)//2])
+        mapping_b = get_asn_mapping(ip_list[len(ip_list)//2:])
+        mapping_c = mapping_a.copy()
+        mapping_c.update(mapping_b)
+        return mapping_c
 
 
 def get_geo_mapping(ip_list):
@@ -88,29 +122,33 @@ def get_geo_mapping(ip_list):
     :return mapping: Returns a dictionary with key value pairs of (ip:geo_info)
     :rtype mapping: dict
     '''
-    mapping = {}
-    # Calling ipinfo with given api key, returning handler
-    api_key = CONFIG['ip_api']
-    handler = ipinfo.getHandler(access_token=api_key)
-    for idx, val in enumerate(ip_list):
-        # Getting all details and updating each dict in the list
-        details = (handler.getDetails(val)).all
-        # Checking keys in returned data and setting variables accordingly
-        # If the key doesn't exists then just set value to None
-        keys = details.keys()
-        org = details['org'] if 'org' in keys and details['org'] else None
-        city = details['city'] if 'city' in keys and details['city'] else None
-        latitude = float(
-            details['latitude']) if 'latitude' in keys and details['latitude'] else None
-        longitude = float(
-            details['longitude']) if 'longitude' in keys and details['longitude'] else None
-        postal = details['postal'] if 'postal' in keys and details['postal'] else None
-        region = details['region'] if 'region' in keys and details['region'] else None
-        mapping.update({ip_list[idx]: {'city': city, 'latitude': latitude,
-                                       'longitude': longitude, 'postal': postal,
-                                       'region': region, 'org': org}})
-    return mapping
-
+    while True:
+        try:
+            mapping = {}
+            # Calling ipinfo with given api key, returning handler
+            api_key = CONFIG['ip_api']
+            handler = ipinfo.getHandler(access_token=api_key)
+            for idx, val in enumerate(ip_list):
+                # Getting all details and updating each dict in the list
+                details = handler.getDetails(val).all
+                # Checking keys in returned data and setting variables accordingly
+                # If the key doesn't exists then just set value to None
+                keys = details.keys()
+                org = details['org'] if 'org' in keys and details['org'] else None
+                city = details['city'] if 'city' in keys and details['city'] else None
+                latitude = float(
+                    details['latitude']) if 'latitude' in keys and details['latitude'] else None
+                longitude = float(
+                    details['longitude']) if 'longitude' in keys and details['longitude'] else None
+                postal = details['postal'] if 'postal' in keys and details['postal'] else None
+                region = details['region'] if 'region' in keys and details['region'] else None
+                mapping.update({ip_list[idx]: {'city': city, 'latitude': latitude,
+                                                'longitude': longitude, 'postal': postal,
+                                                'region': region, 'org': org}})
+            return mapping
+        except requests.exceptions.ReadTimeout: 
+            print("Connection Timeout, waiting to reconnect")
+            time.sleep(60)
 
 def merge_mappings(main_dict, second_dict):
     '''
@@ -124,7 +162,9 @@ def merge_mappings(main_dict, second_dict):
     '''
     result_mapping = {}
     for key, val in main_dict.items():
-        result_mapping.update({key: second_dict.get(val)})
+        value_dict = second_dict.get(val)
+        value_dict.update({'ip':val})
+        result_mapping.update({key: value_dict})
     return result_mapping
 
 
