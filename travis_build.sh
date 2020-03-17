@@ -1,3 +1,3 @@
 #!/bin/sh
-cd $TRAVIS_BUILD_DIR/src/data/kibana/tests/
+cd $TRAVIS_BUILD_DIR/src/utils/tests/
 coverage run -m pytest

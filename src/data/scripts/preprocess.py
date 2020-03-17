@@ -6,9 +6,14 @@
 from os import makedirs
 from os.path import dirname
 
+import sys
 import pandas as pd
 
+sys.path.append('../')
 from utils.file_util import load_yaml
+
+#Global
+CONFIG_PATH = './config.yml'
 
 def main():
     '''main'''
@@ -22,7 +27,7 @@ def make_preprocess():
         3. Add attribute indicating direction of flow
         4. Write to preproccessed.csv
     '''
-    config = load_yaml('./config.yml')
+    config = load_yaml(CONFIG_PATH)
     interim_output_path = config['interim_output_path']
     preprocessed_output_path = config['preprocessed_output_path']
 

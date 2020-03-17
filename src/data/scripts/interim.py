@@ -6,7 +6,13 @@ import socket
 
 from os import makedirs
 from os.path import dirname
+import sys
+
+sys.path.append('../')
 from utils.file_util import load_yaml
+
+#Global
+CONFIG_PATH = './config.yml'
 
 def main():
     '''main'''
@@ -16,7 +22,7 @@ def make_interim():
     '''
         Read input.csv and remove rows null  {srcaddr, dstaddr, srcport, dstport}
     '''
-    config = load_yaml('./config.yml')
+    config = load_yaml(CONFIG_PATH)
     raw_output_path = config['raw_output_path']
     interim_output_path = config['interim_output_path']
     makedirs(dirname(interim_output_path), exist_ok=True)

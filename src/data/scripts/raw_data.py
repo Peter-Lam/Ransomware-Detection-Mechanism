@@ -5,6 +5,12 @@
 import re
 from os import listdir, makedirs
 from os.path import dirname, isfile, join
+import sys
+
+#Global
+CONFIG_PATH = './config.yml'
+
+sys.path.append('../')
 from utils.file_util import load_json, load_yaml
 
 def main():
@@ -13,7 +19,7 @@ def main():
 
 def make_raw_data():
     ''' create input.csv in project/data/raw/ directory '''
-    config = load_yaml('./config.yml')
+    config = load_yaml(CONFIG_PATH)
     binetflow_path = config['binet_output_path']
     raw_output_path = config['raw_output_path']
     dataset_path = config['dataset_path']
@@ -88,8 +94,10 @@ def create_input_csv(file_list, dir_path, output_path, dict_mal_hosts):
                                 additions = [dstu, row_l[-1]]
                                 row_l = row_l[:default_len]
                                 row_l.extend(additions)
-                        row_l[-1] = str(int(row_l[3] in dict_mal_hosts[file_name]
-                                            or row_l[6] in dict_mal_hosts[file_name])) + '\n'
+                        row_l[-1] = str(1) + '\n' if (row_l[3] in
+                                                      dict_mal_hosts[file_name] or
+                                                      row_l[6] in
+                                                      dict_mal_hosts[file_name]) else str(-1) + '\n'
                         line = ','.join(row_l) # Form row as a string
                         input_file.write(line) # Write line to input.csv
                         line = binet_file.readline() # Get Next row
