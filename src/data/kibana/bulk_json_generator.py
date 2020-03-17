@@ -1,8 +1,6 @@
 #!/usr/bin/python
 '''This is a python program which is used to automate the process of
 appending or creating a new ioc JSON file with the appropriate values'''
-import requests
-import socket
 import argparse
 import os.path as path
 import pathlib
@@ -82,7 +80,7 @@ def parse_url_dict(url_list, url_type):
     :rtype: list of dict
     '''
     for url_dict in url_list:
-        try:
+        if url_dict[url_type]:
             url = url_dict[url_type].replace('[', '').replace(']', '').strip()
             if "://" not in url:
                 url = f"http://{url}"
@@ -103,15 +101,20 @@ def parse_url_dict(url_list, url_type):
                 url_filename = ""
 
             url_dict.update({url_type+'_url_query': url_query,
-                            url_type + '_url_path': url_path,
-                            url_type + '_url_filename': url_filename,
-                            url_type + '_url_file_ext': url_file_ext,
-                            url_type + '_url_scheme': url_scheme,
-                            url_type + '_url_hostname': url_hostname,
-                            url_type + '_url_domain': url_domain})
-        except Exception as e:
-            print(e)
-            print(url_dict)
+                             url_type + '_url_path': url_path,
+                             url_type + '_url_filename': url_filename,
+                             url_type + '_url_file_ext': url_file_ext,
+                             url_type + '_url_scheme': url_scheme,
+                             url_type + '_url_hostname': url_hostname,
+                             url_type + '_url_domain': url_domain})
+        else:
+            url_dict.update({url_type+'_url_query': None,
+                    url_type + '_url_path': None,
+                    url_type + '_url_filename': None,
+                    url_type + '_url_file_ext': None,
+                    url_type + '_url_scheme': None,
+                    url_type + '_url_hostname': None,
+                    url_type + '_url_domain': None})
     return url_list
 
 

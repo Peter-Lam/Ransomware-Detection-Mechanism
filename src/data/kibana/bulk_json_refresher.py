@@ -8,14 +8,8 @@ import pathlib
 import sys
 import datetime
 import bulk_json_generator as generator
-from distutils.util import strtobool
-from urllib.parse import urlparse
 sys.path.append('../')
-import utils.validator as validator
 import utils.file_util as util
-import utils.common as common
-import kibana.services.virus_total_service as vt_updater
-import kibana.services.ip_info_service as ip_updater
 
 # Declaring globals
 FILE_PATH = pathlib.Path(__file__).parent.absolute()
@@ -40,15 +34,15 @@ def argparser():
         parser.error(f"The file {args.json_path} does not exist!")
     return args
 
-def parse_bulk_api(path):
+def parse_bulk_api(file_path):
     '''
     Parse data into separate lists based on ioc_type returning a dict
-    :param path: Path to existing bulk api
-    :type path: str
+    :param file_path: Path to existing bulk api
+    :type file_path: str
     :return seperated_mapping: Returns a mapping of ket value pairs (ioc_type: values)
     :rtype domain_list: dict of (str, list)
     '''
-    ioc_list = util.convert_to_json(path)
+    ioc_list = util.convert_to_json(file_path)
     md5_list, sha256_list, url_list, ip_list, domain_list, other_list = [], [], [], [], [], []
     seperated_mapping = {}
     for ioc in ioc_list:
@@ -78,9 +72,10 @@ def main():
     # Parse the JSON into separate lists based on ioc types
     # May return a empy list for a certain ioc type
     parsed_json = parse_bulk_api(args.json_path)
+    key_list = parsed_json.keys()
     updated_values = []
     # For each ioc type, call the appropriate apis
-    for ioc in parsed_json.keys():
+    for ioc in key_list:
         # Only update non null values
         if parsed_json[ioc]:
             updated_values.extend(generator.call_apis(parsed_json[ioc], ioc))

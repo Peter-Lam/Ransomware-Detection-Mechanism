@@ -4,6 +4,7 @@ This service utilizes ipinfo and cymru APIs to update IP and Domains
 with geolocation and asn information
 '''
 import pathlib
+import requests
 import socket
 import sys
 import time
@@ -41,7 +42,7 @@ def domain_to_asn(domain_list):
     '''
     ip_list, domain_ip_mapping = domain_to_ip(domain_list)
     # Removing unresolved ips
-    stripped_ips = [i for i in ip_list if i] 
+    stripped_ips = [i for i in ip_list if i]
     ip_asn_mapping = get_asn_mapping(stripped_ips)
     # Adding empty mapping for unresolved ips
     ip_asn_mapping.update({None:{'asn': None, 'is_bell': None}})
@@ -66,7 +67,7 @@ def domain_to_ip(domain_list):
         try:
             clean_domain = common.strip_brackets(domain)
             ip_value = socket.gethostbyname(clean_domain)
-        except socket.gaierror as e:
+        except socket.gaierror:
             print(f"Unable to find IP for domain {clean_domain}, skipping")
             ip_value = None
         finally:
@@ -85,7 +86,6 @@ def get_asn_mapping(ip_list):
     '''
     mapping = {}
     client = Client()
-    temp = 0
     try:
         # If the length of the list is 1, do a solo api call
         if len(ip_list) == 1:
@@ -143,10 +143,10 @@ def get_geo_mapping(ip_list):
                 postal = details['postal'] if 'postal' in keys and details['postal'] else None
                 region = details['region'] if 'region' in keys and details['region'] else None
                 mapping.update({ip_list[idx]: {'city': city, 'latitude': latitude,
-                                                'longitude': longitude, 'postal': postal,
-                                                'region': region, 'org': org}})
+                                               'longitude': longitude, 'postal': postal,
+                                               'region': region, 'org': org}})
             return mapping
-        except requests.exceptions.ReadTimeout: 
+        except requests.exceptions.ReadTimeout:
             print("Connection Timeout, waiting to reconnect")
             time.sleep(60)
 

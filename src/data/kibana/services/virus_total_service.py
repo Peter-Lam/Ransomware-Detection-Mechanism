@@ -3,10 +3,9 @@
 
 import time
 import pathlib
-import json
 import sys
-import requests
 from datetime import datetime
+import requests
 sys.path.append('../../')
 import utils.file_util as util
 FILE_PATH = pathlib.Path(__file__).parent.absolute()
@@ -133,9 +132,8 @@ def populate_ip(ip_list, vt_url, debug=None):
     print("Gathering ip information from Virus Total...")
     # Loop through list and call API, can't chain values like populate_hash
     for value in ip_list:
-        resource = value['value']
         # Call VT Api
-        response = call_api(vt_url, "ip", resource)
+        response = call_api(vt_url, "ip", value['value'])
         # Update existing hashes
         country = response["country"] if "country" in response else None
         continent = response["continent"] if "continent" in response else None
@@ -155,20 +153,20 @@ def populate_ip(ip_list, vt_url, debug=None):
                 if scan_date < first_scan_date:
                     first_scan_date = scan_date
             percent = round((positives/total)*100, 2)
-        else:
-            total = None
-            positives = None
-            percent = None
-            latest_scan_date = None
-            first_scan_date = None
-            total_detected_urls = 0
 
-        # Updating dictionaries with new values
-        value.update({'is_valid': response["response_code"], 'country': country,
-                      'continent': continent,
-                      'total_detected_urls': total_detected_urls, 'total': total,
-                      'positives': positives, 'percent_score': percent,
-                      'lastest_scan_date': latest_scan_date, 'first_scan_date': first_scan_date})
+            # Updating dictionaries with new values
+            value.update({'is_valid': response["response_code"], 'country': country,
+                        'continent': continent,
+                        'total_detected_urls': total_detected_urls, 'total': total,
+                        'positives': positives, 'percent_score': percent,
+                        'lastest_scan_date': latest_scan_date, 'first_scan_date': first_scan_date})
+        else:
+            # Updating dictionaries with new values
+            value.update({'is_valid': response["response_code"], 'country': country,
+                        'continent': continent,
+                        'total_detected_urls': 0, 'total': None,
+                        'positives': None, 'percent_score': None,
+                        'lastest_scan_date': None, 'first_scan_date': None})
 
         # Writing to JSON at every iteration incase it breaks
         if debug:
@@ -219,10 +217,12 @@ def populate_domain(domain_list, vt_url, debug=None):
             # Updating dictionaries with new values
             domain.update({'is_valid': is_valid, 'total_detected_urls': total_detected_urls,
                            'total': total, 'positives': positives, 'percent_score': percent,
-                           'latest_scan_date': latest_scan_date, 'first_scan_date': first_scan_date})
+                           'latest_scan_date': latest_scan_date,
+                           'first_scan_date': first_scan_date})
         else:
             domain.update({'is_valid': is_valid, 'total': None,
-                           'positives': None, 'percent_score': None, 'latest_scan_date': None, 'first_scan_date': None})
+                           'positives': None, 'percent_score': None,
+                           'latest_scan_date': None, 'first_scan_date': None})
 
         # Writing to JSON at every iteration incase it breaks
         if debug:
