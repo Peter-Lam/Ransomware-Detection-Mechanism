@@ -14,7 +14,7 @@ import utils.file_util as util
 # Declaring globals
 FILE_PATH = pathlib.Path(__file__).parent.absolute()
 # Holds VT API information
-CONFIG = util.load_yaml('{}/config.yml'.format(FILE_PATH.parent))
+CONFIG = util.load_yaml('{}/config.yml'.format(FILE_PATH))
 
 
 def argparser():

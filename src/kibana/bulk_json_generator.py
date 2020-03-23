@@ -17,7 +17,7 @@ import kibana.services.ip_info_service as ip_updater
 # Declaring globals
 FILE_PATH = pathlib.Path(__file__).parent.absolute()
 # Holds VT API information
-CONFIG = util.load_yaml('{}/config.yml'.format(FILE_PATH.parent))
+CONFIG = util.load_yaml('{}/config.yml'.format(FILE_PATH))
 
 
 def argparser():
@@ -109,12 +109,12 @@ def parse_url_dict(url_list, url_type):
                              url_type + '_url_domain': url_domain})
         else:
             url_dict.update({url_type+'_url_query': None,
-                    url_type + '_url_path': None,
-                    url_type + '_url_filename': None,
-                    url_type + '_url_file_ext': None,
-                    url_type + '_url_scheme': None,
-                    url_type + '_url_hostname': None,
-                    url_type + '_url_domain': None})
+                             url_type + '_url_path': None,
+                             url_type + '_url_filename': None,
+                             url_type + '_url_file_ext': None,
+                             url_type + '_url_scheme': None,
+                             url_type + '_url_hostname': None,
+                             url_type + '_url_domain': None})
     return url_list
 
 

@@ -4,10 +4,10 @@ This service utilizes ipinfo and cymru APIs to update IP and Domains
 with geolocation and asn information
 '''
 import pathlib
-import requests
 import socket
 import sys
 import time
+import requests
 import ipinfo
 # https://www.team-cymru.com/IP-ASN-mapping.html
 from cymruwhois import Client
@@ -16,7 +16,7 @@ import utils.common as common
 import utils.file_util as util
 
 FILE_PATH = pathlib.Path(__file__).parent.absolute()
-CONFIG = util.load_yaml('{}/config.yml'.format(FILE_PATH.parent.parent))
+CONFIG = util.load_yaml('{}/config.yml'.format(FILE_PATH.parent))
 
 
 def check_ioc(ioc_type):

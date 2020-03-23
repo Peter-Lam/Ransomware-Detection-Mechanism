@@ -7,7 +7,7 @@ install:
 # command to run tests
 script:
   - pylint ./src/data/make_dataset.py
-  - pylint ./src/data/kibana/
+  - pylint ./src/kibana/
   - pylint ./src/data/scripts/
   - pylint ./src/visualization/
   - pylint ./src/utils/
