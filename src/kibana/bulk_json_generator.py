@@ -2,7 +2,6 @@
 '''This is a python program which is used to automate the process of
 appending or creating a new ioc JSON file with the appropriate values'''
 import argparse
-import json
 import os.path as path
 import pathlib
 import sys
@@ -58,7 +57,7 @@ def argparser():
                         action='store', default=None)
     parser.add_argument('--epoch', dest='epoch', metavar='',
                         required=False, help='Optional - the epoch number of the IOC (e.g. 1)',
-                        type=int,action='store', default=None)
+                        type=int, action='store', default=None)
     args = parser.parse_args()
     # Checking validity pf paths
     if args.existing_path and not path.exists(args.existing_path):
@@ -79,12 +78,6 @@ def argparser():
     # Validating date format
     if args.date and not validator.is_valid_date(args.date):
         parser.error(f"The date '{args.date}' must be in MM/DD/YYYY format")
-    # Validating epoch
-    if args.epoch:
-        try:
-            int(args.epoch)
-        except Exception:
-            parser.error(f"The epoch '{args.epoch} must be an integer'")
     return args
 
 
@@ -171,7 +164,7 @@ def call_apis(list_values, ioc_type):
     return updated_values
 
 
-def set_basic_info(list_values, ioc_type, malware, source, date, rsa_key, epoch_number):
+def set_basic_info(list_values, ioc_type, malware, source, optional):
     '''
     Setting basic ioc information based on cmd arguments
     returning a list of dictionaries containing type, value, malware, and source
@@ -179,10 +172,12 @@ def set_basic_info(list_values, ioc_type, malware, source, date, rsa_key, epoch_
     :param ioc_type: type of ioc (i.e. md5, sha256, ip, domain, url)
     :param malware: type of malware (i.e. emotet, ryuk, trickbot)
     :param source: source url where iocs were posted (i.e. pastebin, twitter)
+    :param optional: optional arguments from argparser (date, rsa_key, epoch_number)
     :type list_values: list
     :type ioc_type: string
     :type malware: string
     :type source: string
+    :type optional: list
     :return baseinfo: returns a list of dictionaries containing type, value, malware, and source
     :rtype: list of dict
     '''
@@ -190,9 +185,9 @@ def set_basic_info(list_values, ioc_type, malware, source, date, rsa_key, epoch_
     date_string = None
     port = None
     full_value = None
-    if date:
-        validator.is_valid_date(date, raise_error=True)
-        date_object = datetime.strptime(date, '%m/%d/%Y')
+    if optional[0]:
+        validator.is_valid_date(optional[0], raise_error=True)
+        date_object = datetime.strptime(optional[0], '%m/%d/%Y')
         date_string = date_object.strftime("%Y/%m/%d")
     # Loop through and add basic ioc information from args
     for value in list_values:
@@ -222,15 +217,15 @@ def set_basic_info(list_values, ioc_type, malware, source, date, rsa_key, epoch_
         # Update dictionary, if IP then it has more fields
         if ioc_type == 'IP':
             ioc_info = {'type': ioc_type, 'full_value':full_value,
-                        'value': resource, 'port': port, 
+                        'value': resource, 'port': port,
                         'malware': malware, 'source': source,
-                        'collection_date': date_string, 'rsa_key': rsa_key,
-                        'epoch':epoch_number}
+                        'collection_date': date_string, 'rsa_key': optional[1],
+                        'epoch':optional[2]}
         else:
-            ioc_info = {'type': ioc_type, 'value': resource, 
+            ioc_info = {'type': ioc_type, 'value': resource,
                         'malware': malware, 'source': source,
-                        'collection_date': date_string, 'rsa_key': rsa_key,
-                        'epoch':epoch_number}
+                        'collection_date': date_string, 'rsa_key': optional[1],
+                        'epoch':optional[2]}
         base_info.append(ioc_info)
     return parse_url_dict(base_info, 'source')
 
@@ -249,7 +244,6 @@ def delete_duplicates(list_values, second_list=False, silent=False):
     existing_values = set()
     clean_list = []
     duplicate_count = 0
-    temp = 0
     if not list_values:
         return False
     # Add second list values to existing set
@@ -258,21 +252,21 @@ def delete_duplicates(list_values, second_list=False, silent=False):
             ioc_field = 'full_value' if 'full_value' in row.keys() else 'value'
             if row[ioc_field] not in existing_values:
                 # keeping track of the added value
-                existing_values.add(row[ioc_field]) 
+                existing_values.add(row[ioc_field])
     for row in list_values:
         ioc_field = 'full_value' if 'full_value' in row.keys() else 'value'
         if row[ioc_field] not in existing_values:
             # keeping track of the added value
             existing_values.add(row[ioc_field])
             # Adding to clean list
-            clean_list.append(row)         
+            clean_list.append(row)
         elif not silent:
             print(f"Duplicate found with value '{row[ioc_field]}, skipping")
             duplicate_count += 1
         else:
             duplicate_count += 1
     if not silent:
-        print(f"Total duplicates found: {duplicate_count}")   
+        print(f"Total duplicates found: {duplicate_count}")
     return clean_list
 
 def main(args):
@@ -285,7 +279,7 @@ def main(args):
     # Set the basic info given by args
     base_info = set_basic_info(
         list_values, args.ioc[0], args.malware.lower(),
-        args.source, args.date, args.rsa, args.epoch)
+        args.source, [args.date, args.rsa, args.epoch])
     # Delete any duplicates
     if args.existing_path:
         original_values = util.convert_to_json(args.existing_path)
