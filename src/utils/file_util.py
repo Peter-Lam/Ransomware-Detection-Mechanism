@@ -57,7 +57,7 @@ def convert_to_json(bulk_json_path, output_path=None, silent=False):
     new_contents = []
     for line in file_contents:
         if "{\"index\":" not in line:
-            new_contents.append(line)
+            new_contents.append(json.loads(line))
     if output_path:
         write_json(new_contents, output_path)
         if not silent:
