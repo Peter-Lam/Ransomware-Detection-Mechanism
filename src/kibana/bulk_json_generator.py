@@ -58,6 +58,9 @@ def argparser():
     parser.add_argument('--epoch', dest='epoch', metavar='',
                         required=False, help='Optional - the epoch number of the IOC (e.g. 1)',
                         type=int, action='store', default=None)
+    parser.add_argument('--silent', dest='silent',
+                        required=False, help='Optional - Silent mode for reduced system logs',
+                        action='store_true')
     args = parser.parse_args()
     # Checking validity pf paths
     if args.existing_path and not path.exists(args.existing_path):
@@ -143,7 +146,7 @@ def call_apis(list_values, ioc_type):
     if len(list_values) == 0:
         # print(f"No valid values found for ioc type: '{ioc_type}', not calling api")
         updated_values = None
-    elif ioc_type in ('MD5', 'SHA256'):
+    elif ioc_type in ['MD5', 'SHA256']:
         updated_values = vt_updater.populate_hash(
             list_values, CONFIG['vt_report'], CONFIG['api_limit'])
     elif ioc_type == 'IP':
@@ -154,9 +157,12 @@ def call_apis(list_values, ioc_type):
         for num in range(0, len(list_values), 100):
             updated_values += ip_updater.update_all(vt_updated_values[num:num+100], ioc_type)
     elif ioc_type in ('URL', 'DOMAIN'):
-        vt_updated_values = list_values
-        # vt_updated_values = vt_updater.populate_domain(
-        #     list_values, CONFIG['vt_domain'])
+        if ioc_type == 'URL':
+            vt_updated_values = list_values
+            vt_updated_values = vt_updater.populate_url(list_values, CONFIG['vt_url'])
+        else:
+            vt_updated_values = list_values
+            vt_updated_values = vt_updater.populate_domain(list_values, CONFIG['vt_domain'])
         print(f"Gathering {ioc_type} information from IPInfo and Cymru")
         ip_updated_values = parse_url_dict(vt_updated_values, 'value')
         updated_values = ip_updater.update_all(ip_updated_values, ioc_type)
@@ -273,6 +279,8 @@ def delete_duplicates(list_values, second_list=False, silent=False):
 def main(args):
     '''main'''
     start_time = datetime.now()
+    # Validating config file for API keys
+    validator.is_valid_kibana_config(CONFIG, raise_error=True)
     print(f"{start_time} - Starting script...")
     # Read text file and grabbing a list of values
     list_values = util.load_file(args.values_path)
@@ -284,9 +292,10 @@ def main(args):
     # Delete any duplicates
     if args.existing_path:
         original_values = util.convert_to_json(args.existing_path)
-        removed_duplicates = delete_duplicates(base_info, second_list=original_values, silent=True)
+        removed_duplicates = delete_duplicates(base_info,
+                                               second_list=original_values, silent=args.silent)
     else:
-        removed_duplicates = delete_duplicates(base_info, silent=True)
+        removed_duplicates = delete_duplicates(base_info, silent=args.silent)
 
     # Populate missing data with various apis
     updated_values = call_apis(removed_duplicates, args.ioc[0])

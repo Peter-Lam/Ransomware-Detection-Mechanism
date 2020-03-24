@@ -4,7 +4,7 @@ vt_ip: "https://www.virustotal.com/vtapi/v2/ip-address/report"
 vt_domain: "https://www.virustotal.com/vtapi/v2/domain/report"
 
 # List of api keys for virustotal.co
-api_key: [""]
+api_key: []
 api_limit: 4
 
 # This api key is for ipinfo.io

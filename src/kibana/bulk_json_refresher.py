@@ -8,6 +8,7 @@ import sys
 import datetime
 import bulk_json_generator as generator
 sys.path.append('../')
+import utils.validator as validator
 import utils.file_util as util
 
 # Declaring globals
@@ -65,6 +66,9 @@ def main():
     '''main'''
     args = argparser()
     ioc_file = args.json_path
+
+    # Validating config file for API keys
+    validator.is_valid_kibana_config(CONFIG, raise_error=True)
     start_time = datetime.datetime.now()
     print(f"{start_time} - Updating existing JSON, this may take a while...")
     # Parse the JSON into separate lists based on ioc types

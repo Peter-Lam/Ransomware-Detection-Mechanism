@@ -180,7 +180,7 @@ def update_dict(list_of_dicts, mapping):
     '''
     for value in list_of_dicts:
         # Get a dictionary of values (i.e. {asn:__, is_bell:__})
-        if value['type'] in ['DOMAIN','URL']:
+        if value['type'] in ['DOMAIN', 'URL']:
             to_update = mapping.get(value['value_url_domain'])
         else:
             to_update = mapping.get(value['value'])
@@ -218,12 +218,15 @@ def update_asn_info(list_of_dicts, ioc_type):
     # Validating ioc_type
     check_ioc(ioc_type)
     # Get the values for the ioc_type
-    for ioc in list_of_dicts:
-        value_list.append(ioc['value'])
-    if ioc_type == 'DOMAIN':
+
+    if ioc_type in ['DOMAIN', 'URL']:
+        for ioc in list_of_dicts:
+            value_list.append(ioc['value_url_domain'])
         asn_mapping = domain_to_asn(value_list)
     # If not domain then its ip, so call the ip_to_asn function
     else:
+        for ioc in list_of_dicts:
+            value_list.append(ioc['value'])
         asn_mapping = get_asn_mapping(value_list)
     # Return the updated list_of_dicts with the ASN values
     return update_dict(list_of_dicts, asn_mapping)
@@ -243,7 +246,7 @@ def update_geo_info(list_of_dicts, ioc_type):
     # Validating ioc_type
     check_ioc(ioc_type)
     # Get the values for the ioc_type
-    if ioc_type in ['DOMAIN','URL']:
+    if ioc_type in ['DOMAIN', 'URL']:
         for ioc in list_of_dicts:
             value_list.append(ioc['value_url_domain'])
         ip_list, domain_ip_mapping = domain_to_ip(value_list)
