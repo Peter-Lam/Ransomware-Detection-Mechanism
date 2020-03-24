@@ -2,6 +2,7 @@
 '''This is a python program which is used to automate the process of
 appending or creating a new ioc JSON file with the appropriate values'''
 import argparse
+import json
 import os.path as path
 import pathlib
 import sys
@@ -49,12 +50,15 @@ def argparser():
     parser.add_argument('-src', '--source', dest='source', metavar='', required=True,
                         help='Source of malware dataset(e.g. www.virusshare.com)',
                         action='store')
-    parser.add_argument('--date', dest='date', metavar='',
-                        required=False, help='Optional - date of when IOC was collected (MM/DD/YYYY)', action='store', default=None)
+    parser.add_argument('--date', dest='date', metavar='', required=False,
+                        help='Optional - date of when IOC was collected (MM/DD/YYYY)',
+                        action='store', default=None)
     parser.add_argument('--rsa', dest='rsa', metavar='',
-                        required=False, help='Optional - the RSA key of the IOC', action='store', default=None)
+                        required=False, help='Optional - the RSA key of the IOC',
+                        action='store', default=None)
     parser.add_argument('--epoch', dest='epoch', metavar='',
-                        required=False, help='Optional - the epoch number of the IOC (e.g. 1)', action='store', default=None)
+                        required=False, help='Optional - the epoch number of the IOC (e.g. 1)',
+                        type=int,action='store', default=None)
     args = parser.parse_args()
     # Checking validity pf paths
     if args.existing_path and not path.exists(args.existing_path):
@@ -167,7 +171,7 @@ def call_apis(list_values, ioc_type):
     return updated_values
 
 
-def set_basic_info(list_values, ioc_type, malware, source, date=None, rsa_key=None, epoch_number=None):
+def set_basic_info(list_values, ioc_type, malware, source, date, rsa_key, epoch_number):
     '''
     Setting basic ioc information based on cmd arguments
     returning a list of dictionaries containing type, value, malware, and source
@@ -231,33 +235,78 @@ def set_basic_info(list_values, ioc_type, malware, source, date=None, rsa_key=No
     return parse_url_dict(base_info, 'source')
 
 
+def delete_duplicates(list_values, second_list=False, silent=False):
+    '''
+    Deleting duplicate rows that contain the same values in a given list
+    If second list is given, will remove duplicates from first list if present in second
+    :param list_values: the list of ioc dictionaries to update
+    :type list_values: list of dict
+    :return clean_list: returns cleaned information
+    :return duplicate_count: returns number of duplicated detected
+    :rtype clean_list: list of dict
+    :rtype duplicate_count: int
+    '''
+    existing_values = set()
+    clean_list = []
+    duplicate_count = 0
+    temp = 0
+    if not list_values:
+        return False
+    # Add second list values to existing set
+    if second_list:
+        for row in second_list:
+            ioc_field = 'full_value' if 'full_value' in row.keys() else 'value'
+            if row[ioc_field] not in existing_values:
+                # keeping track of the added value
+                existing_values.add(row[ioc_field]) 
+    for row in list_values:
+        ioc_field = 'full_value' if 'full_value' in row.keys() else 'value'
+        if row[ioc_field] not in existing_values:
+            # keeping track of the added value
+            existing_values.add(row[ioc_field])
+            # Adding to clean list
+            clean_list.append(row)         
+        elif not silent:
+            print(f"Duplicate found with value '{row[ioc_field]}, skipping")
+            duplicate_count += 1
+        else:
+            duplicate_count += 1
+    if not silent:
+        print(f"Total duplicates found: {duplicate_count}")   
+    return clean_list
+
 def main(args):
     '''main'''
+    start_time = datetime.now()
+    print(f"{start_time} - Starting script...")
     # Read text file and grabbing a list of values
     list_values = util.load_file(args.values_path)
 
     # Set the basic info given by args
     base_info = set_basic_info(
         list_values, args.ioc[0], args.malware.lower(),
-        args.source, args.date, args.rsa, int(args.epoch))
-    # Populate missing data with various apis
-    updated_values = call_apis(base_info, args.ioc[0])
+        args.source, args.date, args.rsa, args.epoch)
+    # Delete any duplicates
+    if args.existing_path:
+        original_values = util.convert_to_json(args.existing_path)
+        removed_duplicates = delete_duplicates(base_info, second_list=original_values, silent=True)
+    else:
+        removed_duplicates = delete_duplicates(base_info, silent=True)
 
+    # Populate missing data with various apis
+    updated_values = call_apis(removed_duplicates, args.ioc[0])
+
+    end_time = datetime.now()
     # If updating file, read JSON file to find the last index and insert the new values
     if args.existing_path:
         print("Updating existing JSON...")
-        ioc_file = args.existing_path
-        util.update_bulk_api(updated_values, ioc_file)
-
-        print(f"BulkAPI JSON Updated at: {ioc_file}")
+        util.update_bulk_api(updated_values, args.existing_path)
+        print(f"{end_time} - BulkAPI JSON Updated at: {args.existing_path}")
     # If its a new file, then create and write to a new file
     else:
         print("Writing to new JSON...")
-        ioc_file = args.new_path
-        util.write_bulk_api(updated_values, ioc_file)
-        print(f"New file has been created at: {ioc_file}")
-
-
+        util.write_bulk_api(updated_values, args.existing_path)
+        print(f"{end_time} - New file has been created at: {args.existing_path}")
 if __name__ == "__main__":
     ARGS = argparser()
     main(ARGS)
