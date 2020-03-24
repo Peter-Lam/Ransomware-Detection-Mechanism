@@ -121,11 +121,9 @@ def populate_ip(ip_list, vt_url, debug=None):
     Updates ioc ip dictionaries with VT data
     :param ip_list: The list of ips that need to be updated
     :param vt_url: URL used for VT API call
-    :param api_limit: The API call limit of the API key, if public usually 4
     :param debug: Debug mode option to add extra console logs
     :type ip_list: list of dict
     :type vt_url: str
-    :type api_limit: int
     :type debug: bool, optional
     :return hast_list: Returns updated ip information
     :rtype hash_list: list of dict'''
@@ -180,13 +178,11 @@ def populate_ip(ip_list, vt_url, debug=None):
 def populate_domain(domain_list, vt_url, debug=None):
     '''
     Updates ioc populate_domain dictionaries with VT data
-    :param populate_domain: The list of domains that need to be updated
+    :param domain_list: The list of domains that need to be updated
     :param vt_url: URL used for VT API call
-    :param api_limit: The API call limit of the API key, if public usually 4
     :param debug: Debug mode option to add extra console logs
-    :type populate_domain: list of dict
+    :type domain_list: list of dict
     :type vt_url: str
-    :type api_limit: int
     :type debug: bool, optional
     :return hast_list: Returns updated domain information
     :rtype hash_list: list of dict'''
@@ -231,3 +227,39 @@ def populate_domain(domain_list, vt_url, debug=None):
                 domain_list, "{}/inputs/domain_logs.json".format(FILE_PATH.parent))
 
     return domain_list
+
+def populate_url(url_list, vt_url, debug=None):
+    '''
+    Updates ioc urls dictionaries with VT data
+    :param url_list: The list of urls that need to be updated
+    :param vt_url: URL used for VT API call
+    :param debug: Debug mode option to add extra console logs
+    :type url_list: list of dict
+    :type vt_url: str
+    :type debug: bool, optional
+    :return hast_list: Returns updated domain information
+    :rtype hash_list: list of dict'''
+    # Loop through list and call API, can't chain values like populate_hash
+    print("Gathering URL information from Virus Total...")
+    for url in url_list:
+        resource = (url['value']).replace('[', '').replace(']', '').strip()
+        # Call VT Api
+        response = call_api(vt_url, "resource", resource)
+        # Update existing urls
+        is_valid = response["response_code"]
+        total = response["total"] if "total" in response else None
+        positives = response["positives"] if "positives" in response else None
+        scan_date = response["scan_date"] if "scan_date" in response else None
+        percent = round((positives/total)*100,
+                        2) if (positives and total) else None
+
+        # Updating dictionaries with new values
+        url.update({'is_valid': is_valid, 'total': total,
+                    'positives': positives, 'percent_score': percent, 'scan_date': scan_date})
+
+        # Writing to JSON at every iteration incase it breaks
+        if debug:
+            util.write_json(
+                url_list, "{}/inputs/url_logs.json".format(FILE_PATH.parent))
+
+    return url_list

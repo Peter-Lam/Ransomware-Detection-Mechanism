@@ -127,5 +127,7 @@ Once the venv is activated, python will be run with the venv and all libraries c
 5. Point your browser at http://localhost:5601   
 
 ### Setting up RDM Kibana Environment
-For information on how to set up the RDM Kibana EEnvironment with the IOCS, see the [Setting Up Kibana Environment](https://github.com/TranAlan/Ransomware-Detection-Mechanism/wiki/Setting-Up-Kibana-Environment) page.
+For information on how to set up the RDM Kibana Environment with the IOCS, see the [Setting Up Kibana Environment](https://github.com/TranAlan/Ransomware-Detection-Mechanism/wiki/Setting-Up-Kibana-Environment) page.
 
+### Using BulkAPI JSON Scripts
+For information on how to use BulkAPI JSON scripts, see the [How to Use Bulk JSON Scripts](https://github.com/TranAlan/Ransomware-Detection-Mechanism/wiki/How-to-Use-Bulk-JSON-Scripts) page.
