@@ -154,11 +154,12 @@ def call_apis(list_values, ioc_type):
         for num in range(0, len(list_values), 100):
             updated_values += ip_updater.update_all(vt_updated_values[num:num+100], ioc_type)
     elif ioc_type in ('URL', 'DOMAIN'):
-        vt_updated_values = vt_updater.populate_domain(
-            list_values, CONFIG['vt_domain'])
+        vt_updated_values = list_values
+        # vt_updated_values = vt_updater.populate_domain(
+        #     list_values, CONFIG['vt_domain'])
         print(f"Gathering {ioc_type} information from IPInfo and Cymru")
-        ip_updated_values = ip_updater.update_all(vt_updated_values, ioc_type)
-        updated_values = parse_url_dict(ip_updated_values, 'value')
+        ip_updated_values = parse_url_dict(vt_updated_values, 'value')
+        updated_values = ip_updater.update_all(ip_updated_values, ioc_type)
     else:
         updated_values = list_values
     return updated_values
