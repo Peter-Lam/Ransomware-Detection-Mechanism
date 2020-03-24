@@ -179,20 +179,20 @@ def update_bulk_api(ioc_dicts, output_path):
     updated_list = []
     if not os.path.exists(output_path):
         raise Exception(f"The path: {output_path} does not exist")
+    if ioc_dicts:
+        # Set current index by getting last index + 1
+        current_index = get_last_index(output_path) + 1
+        # Add index line in-between each line of ioc data
+        for value in ioc_dicts:
+            updated_list.append(json.dumps(
+                {"index": {"_index": "ioc", "_id": current_index}}))
+            updated_list.append(json.dumps(value))
+            current_index += 1
 
-    # Set current index by getting last index + 1
-    current_index = get_last_index(output_path) + 1
-    # Add index line in-between each line of ioc data
-    for value in ioc_dicts:
-        updated_list.append(json.dumps(
-            {"index": {"_index": "ioc", "_id": current_index}}))
-        updated_list.append(json.dumps(value))
-        current_index += 1
-
-    # Write to the JSON file
-    with open(output_path, "a") as file:
-        for line in updated_list:
-            file.write(line + "\n")
+        # Write to the JSON file
+        with open(output_path, "a") as file:
+            for line in updated_list:
+                file.write(line + "\n")
 
 
 def update_json(data, output_path):
