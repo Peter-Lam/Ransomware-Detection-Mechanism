@@ -2,7 +2,6 @@
 '''This is a python program which is used to automate the process of
 updating ioc JSON file with new api information, no new rows added'''
 import argparse
-import json
 import os.path as path
 import pathlib
 import sys
@@ -22,9 +21,9 @@ def argparser():
     parser = argparse.ArgumentParser(
         description="Updating/Refreshing existing JSON latest API information")
     parser.add_argument('-path', '--path', required=True, dest='json_path', metavar='',
-                       help='Path to bulk api JSON to be updated\
+                        help='Path to bulk api JSON to be updated\
                             (e.g. C:/GitHub-Projects/Ransomware-Detection-Mechanism/ioc_list.json',
-                       action='store')
+                        action='store')
 
     args = parser.parse_args()
     # Checking validity pf paths

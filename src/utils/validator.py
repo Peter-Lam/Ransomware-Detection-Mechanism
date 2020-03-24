@@ -28,7 +28,7 @@ def is_valid_ipv4(value, raise_error=False):
         return False
 
 
-def is_valid_ipv6(value, raise_error=False, silent=False):
+def is_valid_ipv6(value, raise_error=False):
     '''
     Check if value is a valid ipv6.
     If raise_error is enabled then raise an error, otherwise just print a warning
@@ -106,7 +106,7 @@ def is_valid_date(value, raise_error=False):
     :rtype: boolean
     '''
     try:
-        date_object = datetime.datetime.strptime(value, '%m/%d/%Y')
+        datetime.datetime.strptime(value, '%m/%d/%Y')
         return True
     except ValueError as message:
         if raise_error:
