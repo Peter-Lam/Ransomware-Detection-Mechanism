@@ -26,7 +26,7 @@ def check_ioc(ioc_type):
     :type ioc_type: str
     :raises Exception: Invalid ioc type
     '''
-    valid_types = ['DOMAIN', 'IP']
+    valid_types = ['DOMAIN', 'IP', 'URL']
     if not ioc_type in valid_types:
         raise Exception(
             f"Unable to get information from ioc_type, {ioc_type}, must be {valid_types}")
@@ -180,8 +180,12 @@ def update_dict(list_of_dicts, mapping):
     '''
     for value in list_of_dicts:
         # Get a dictionary of values (i.e. {asn:__, is_bell:__})
-        to_update = mapping.get(value['value'])
-        value.update(to_update)
+        if value['type'] in ['DOMAIN','URL']:
+            to_update = mapping.get(value['value_url_domain'])
+        else:
+            to_update = mapping.get(value['value'])
+        if to_update:
+            value.update(to_update)
     return list_of_dicts
 
 
@@ -239,14 +243,16 @@ def update_geo_info(list_of_dicts, ioc_type):
     # Validating ioc_type
     check_ioc(ioc_type)
     # Get the values for the ioc_type
-    for ioc in list_of_dicts:
-        value_list.append(ioc['value'])
-    if ioc_type == 'DOMAIN':
+    if ioc_type in ['DOMAIN','URL']:
+        for ioc in list_of_dicts:
+            value_list.append(ioc['value_url_domain'])
         ip_list, domain_ip_mapping = domain_to_ip(value_list)
         ip_geo_mapping = get_geo_mapping(ip_list)
         geo_mapping = merge_mappings(domain_ip_mapping, ip_geo_mapping)
     # If not domain then its ip, so call the ip_to_asn function
     else:
+        for ioc in list_of_dicts:
+            value_list.append(ioc['value'])
         geo_mapping = get_geo_mapping(value_list)
     # Return the updated list_of_dicts with the ASN values
     return update_dict(list_of_dicts, geo_mapping)
