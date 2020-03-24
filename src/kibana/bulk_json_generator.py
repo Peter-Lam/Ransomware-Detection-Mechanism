@@ -5,6 +5,7 @@ import argparse
 import os.path as path
 import pathlib
 import sys
+from datetime import datetime
 from distutils.util import strtobool
 from urllib.parse import urlparse
 sys.path.append('../')
@@ -26,20 +27,20 @@ def argparser():
         description="Appending or creating new json files with new information")
     # Making new file and update file mutually exclusive options
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-new', '--new', dest='new_path', metavar='',
+    group.add_argument('--new', dest='new_path', metavar='',
                        help='writes to the full path of desired json file\
                             (e.g. C:/GitHub-Projects/Ransomware-Detection-Mechanism/ioc_list.json',
                        action='store')
-    group.add_argument('-update', '--update', dest='existing_path', metavar='',
+    group.add_argument('--update', dest='existing_path', metavar='',
                        help='appends the existing BULK api json file with new data\
                             (e.g. C:/GitHub-Projects/Ransomware-Detection-Mechanism/ioc_list.json',
                        action='store')
-    parser.add_argument('-text', '--text', dest='values_path', metavar='',
+    parser.add_argument('--text', dest='values_path', metavar='',
                         required=True, help='text file containing values of the iocs',
                         action='store')
-    parser.add_argument('-malware', '--malware', dest='malware', metavar='',
+    parser.add_argument('--malware', dest='malware', metavar='',
                         required=True, help='type of malware (e.g. Trickbot)', action='store')
-    parser.add_argument('-ioc', '--ioc_type', type=str.upper, dest='ioc', nargs=1,
+    parser.add_argument('--ioc_type', type=str.upper, dest='ioc', nargs=1,
                         choices=['MD5', 'SHA256', 'IP',
                                  'URL', 'DOMAIN', 'other'],
                         metavar='', required=True,
@@ -48,6 +49,12 @@ def argparser():
     parser.add_argument('-src', '--source', dest='source', metavar='', required=True,
                         help='Source of malware dataset(e.g. www.virusshare.com)',
                         action='store')
+    parser.add_argument('--date', dest='date', metavar='',
+                        required=False, help='Optional - date of when IOC was collected (MM/DD/YYYY)', action='store', default=None)
+    parser.add_argument('--rsa', dest='rsa', metavar='',
+                        required=False, help='Optional - the RSA key of the IOC', action='store', default=None)
+    parser.add_argument('--epoch', dest='epoch', metavar='',
+                        required=False, help='Optional - the epoch number of the IOC (e.g. 1)', action='store', default=None)
     args = parser.parse_args()
     # Checking validity pf paths
     if args.existing_path and not path.exists(args.existing_path):
@@ -63,9 +70,17 @@ def argparser():
                 parser.error("Please choose another path")
         except ValueError:
             parser.error("Invalid answer, please select 'Y' or 'N' next time")
-
     if not path.exists(args.values_path):
         parser.error(f"The file {args.values_path} does not exist!")
+    # Validating date format
+    if args.date and not validator.is_valid_date(args.date):
+        parser.error(f"The date '{args.date}' must be in MM/DD/YYYY format")
+    # Validating epoch
+    if args.epoch:
+        try:
+            int(args.epoch)
+        except Exception:
+            parser.error(f"The epoch '{args.epoch} must be an integer'")
     return args
 
 
@@ -152,7 +167,7 @@ def call_apis(list_values, ioc_type):
     return updated_values
 
 
-def set_basic_info(list_values, ioc_type, malware, source):
+def set_basic_info(list_values, ioc_type, malware, source, date=None, rsa_key=None, epoch_number=None):
     '''
     Setting basic ioc information based on cmd arguments
     returning a list of dictionaries containing type, value, malware, and source
@@ -168,37 +183,63 @@ def set_basic_info(list_values, ioc_type, malware, source):
     :rtype: list of dict
     '''
     base_info = []
+    date_string = None
+    port = None
+    full_value = None
+    if date:
+        validator.is_valid_date(date, raise_error=True)
+        date_object = datetime.strptime(date, '%m/%d/%Y')
+        date_string = date_object.strftime("%Y/%m/%d")
     # Loop through and add basic ioc information from args
     for value in list_values:
+        # If the ioc type is a hash but not a valid one, print a warning and skip it
+        resource = value.strip()
+        if ioc_type == 'MD5' and not validator.is_valid_md5(resource):
+            continue
+        if ioc_type == 'SHA256' and not validator.is_valid_sha256(resource):
+            continue
         # Only remove [] from IP but not others, like urls and domain to prevent accidental clicks
         if ioc_type == 'IP':
             resource = common.strip_brackets(value)
-            # If the ip is not valid, print warning and skip this value
-            if not validator.is_valid_ip(resource):
-                continue
+            # If validation failed for ipv4 and ipv6, try to parse if there are any ports for ipv4
+            if not validator.is_valid_ipv6(resource) and not validator.is_valid_ipv4(resource):
+                parsed_ip = resource.split(":")
+                # Re-validate by removing possible ports
+                if len(parsed_ip) != 2 or not validator.is_valid_ipv4(parsed_ip[0]):
+                    print(f"The following ip '{value}' is not a valid ipv4 or ipv6, skipping")
+                    continue
+                # Otherwise, valid ip so swap resource and add a port
+                full_value = resource
+                resource = parsed_ip[0]
+                port = int(parsed_ip[1])
+            else:
+                full_value = resource
+
+        # Update dictionary, if IP then it has more fields
+        if ioc_type == 'IP':
+            ioc_info = {'type': ioc_type, 'full_value':full_value,
+                        'value': resource, 'port': port, 
+                        'malware': malware, 'source': source,
+                        'collection_date': date_string, 'rsa_key': rsa_key,
+                        'epoch':epoch_number}
         else:
-            # If the ioc type is a hash but not a validone, print a warning and skip it
-            resource = value.strip()
-            if ioc_type == 'MD5' and not validator.is_valid_md5(resource):
-                continue
-            if ioc_type == 'SHA256' and not validator.is_valid_sha256(resource):
-                continue
-        base_info.append({'type': ioc_type, 'value': resource,
-                          'malware': malware, 'source': source})
+            ioc_info = {'type': ioc_type, 'value': resource, 
+                        'malware': malware, 'source': source,
+                        'collection_date': date_string, 'rsa_key': rsa_key,
+                        'epoch':epoch_number}
+        base_info.append(ioc_info)
     return parse_url_dict(base_info, 'source')
 
 
-def main():
+def main(args):
     '''main'''
-    args = argparser()
-
     # Read text file and grabbing a list of values
     list_values = util.load_file(args.values_path)
 
     # Set the basic info given by args
     base_info = set_basic_info(
-        list_values, args.ioc[0], args.malware.lower(), args.source)
-
+        list_values, args.ioc[0], args.malware.lower(),
+        args.source, args.date, args.rsa, int(args.epoch))
     # Populate missing data with various apis
     updated_values = call_apis(base_info, args.ioc[0])
 
@@ -218,4 +259,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    ARGS = argparser()
+    main(ARGS)
