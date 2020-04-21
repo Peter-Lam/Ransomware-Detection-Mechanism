@@ -1,7 +1,7 @@
 Ransomware-Detection-Mechanism
 ==============================
 [![Build Status](https://travis-ci.com/TranAlan/Ransomware-Detection-Mechanism.svg?token=XYhputEuMBMoSF6Pp5xP&branch=master)](https://travis-ci.com/TranAlan/Ransomware-Detection-Mechanism)  
-Ransomware Detection Mechanism (RDM) is a tool combining machine learning to detect ransomware viruses within a network. This is a 2020 University of Ottawa undergraduate honours project.
+Ransomware Detection Mechanism (RDM) is a tool for both combining machine learning to detect ransomware viruses within a network and to collect, visualize, and analyze IOCs for emotet. This is a 2020 University of Ottawa undergraduate honours project.
 
 ## Project Members
 * [Alan Tran](https://www.linkedin.com/in/alantran29/)
@@ -17,16 +17,23 @@ ___
 Project Organization
 ------------
 
-    ├── LICENSE
+    ├── LICENSE            <- Currently NO License
     ├── Makefile           <- Makefile with commands like `make data` or `make train`
     ├── README.md          <- The top-level README for developers using this project.
     ├── data
     │   ├── external       <- Data from third party sources.
+    │   │    ├── binetflow <- Bidirectional netflow files for training set.
+    │   │    └── validation <- Bidirectional netflow files for validation.
     │   ├── interim        <- Intermediate data that has been transformed.
+    │   ├── preprocessed   <- Clean data set.
     │   ├── processed      <- The final, canonical data sets for modeling.
-    │   └── raw            <- The original, immutable data dump.
+    │   ├── raw            <- The original, immutable data dump.
+    │   ├── trained        <- The final data set after training and testing.
+    │   └── validation     <- Results of validating model with validation data.
     │
     ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
+    │
+    ├── metric             <- Generated files for training and validation metrics
     │
     ├── models             <- Trained and serialized models, model predictions, or model summaries
     │
@@ -42,25 +49,24 @@ Project Organization
     ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
     │                         generated with `pip freeze > requirements.txt`
     │
-    ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
-    ├── src                <- Source code for use in this project.
-    │   ├── __init__.py    <- Makes src a Python module
-    │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │   └── make_dataset.py
-    │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
-    │   │
-    │   ├── models         <- Scripts to train models and then use trained models to make
-    │   │   │                 predictions
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
-    │   │
-    │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │       └── visualize.py
-    │
-    └── tox.ini            <- tox file with settings for running tox; see tox.testrun.org
+    └── src                <- Source code for use in this project.
+        ├── __init__.py    <- Makes src a Python module
+        │
+        ├── data           <- Scripts to download or generate data
+        │   └── make_dataset.py
+        │
+        ├── features       <- Scripts to turn raw data into features for modeling
+        │   └── build_features.py
+        │
+        ├── kibana         <- Scripts to collect iocs for kibana.
+        │
+        ├── models         <- Scripts to train models and then use trained models to make
+        │   │                 predictions
+        │   ├── predict_model.py
+        │   └── train_model.py
+        │
+        └── visualization  <- Scripts to create exploratory and results oriented visualizations
+            └── visualize.py
 
 
 --------
@@ -106,12 +112,12 @@ This will create a venv and folder called RMD-env. To activate the venv you must
 
 Once the venv is activated, python will be run with the venv and all libraries can be installed specifically in the venv. Now we must install key python libraries.
 ```
-> (RDM-env) C:\Users\alan1\pip install pylint
-
-> (RDM-env) C:\Users\alan1\pip install requests
-
-> (RDM-env) C:\Users\alan1\pip install pyyaml
+> (RDM-env) C:\Ransomware-Detection-Mechanism\pip install -r requirements.txt
 ```
+
+You are now ready to run scripts. Proceed to Kibana or Training for more information.
+
+## IOC Dashboard (Kibana)
 
 ### Elasticsearch
 1. Download and unzip from https://www.elastic.co/downloads/elasticsearch
@@ -128,6 +134,61 @@ Once the venv is activated, python will be run with the venv and all libraries c
 
 ### Setting up RDM Kibana Environment
 For information on how to set up the RDM Kibana Environment with the IOCS, see the [Setting Up Kibana Environment](https://github.com/TranAlan/Ransomware-Detection-Mechanism/wiki/Setting-Up-Kibana-Environment) page.
+
+## Pipeline
+    ├── 1. Preparing Data (1.3 mil rows)                  <- /src/data> python make_dataset.py
+    │      ├── 1. Download data sets        (8.5  min)
+    │      ├── 2. Create raw data           (8.5  sec)
+    │      ├── 3. Create interim data       (8    sec)
+    │      └── 4. Create preprocessed data  (30   sec)
+    ├── 2. Build Features (1.3 mil rows)    (2.28 hours)   <- /src/features> python build_features.py
+    ├── 3. Train Model    (1.3 mil rows)    (6.38  hours)  <- /src/models> python train_model.py
+    │      ├── One Class SVM                (5.03  hours)
+    │      ├── Confidence SCore             (36.4  min)
+    │      ├── Save OC Features CSV         (4.4   min)
+    │      ├── Linear Regression            (22.2  min)
+    │      └── Save LR Features CSV         (4.6   min)
+    └── 4. Predict Model                    (24.7  min)     <- /src/models> python predict_model.py
+
+## Docker
+### Train
+```bash
+$ docker build -f DockerTrain/Dockerfile -t train_model:latest .
+$ docker run -d train_model:latest
+```
+
+### Predict
+```bash
+$ docker build -f DockerPredict/Dockerfile -t predict_model:latest .
+$ docker run -d predict_model:latest
+```
+### Interact with Container
+```bash
+$ docker ps -a
+$ docker exec -it (container id) bash
+```
+## Training and Predict Locally
+Follow these instructions to run train or predict off the bat.
+```bash
+$ cd project/src/models
+$ python train_model.py
+$ python predict_model.py
+```
+## Performing Pipeline Entirely
+Follow these instructions to train or test models from scratch.
+
+```bash
+$ cd project/src/data
+$ python make_dataset.py
+$ cd ../features
+$ python build_features.py
+$ cd ../models
+$ python train_model.py
+$ python predict_model.py
+```
+
+## More Information
+Visit the [Github Wiki](https://github.com/TranAlan/Ransomware-Detection-Mechanism/wiki) for more documentation and research on the project.
 
 ### Using BulkAPI JSON Scripts
 For information on how to use BulkAPI JSON scripts, see the [How to Use Bulk JSON Scripts](https://github.com/TranAlan/Ransomware-Detection-Mechanism/wiki/How-to-Use-Bulk-JSON-Scripts) page.

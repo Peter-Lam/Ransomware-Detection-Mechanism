@@ -94,10 +94,8 @@ def create_input_csv(file_list, dir_path, output_path, dict_mal_hosts):
                                 additions = [dstu, row_l[-1]]
                                 row_l = row_l[:default_len]
                                 row_l.extend(additions)
-                        row_l[-1] = str(1) + '\n' if (row_l[3] in
-                                                      dict_mal_hosts[file_name] or
-                                                      row_l[6] in
-                                                      dict_mal_hosts[file_name]) else str(-1) + '\n'
+                        row_l[-1] = str(int(row_l[3] in dict_mal_hosts[file_name]
+                                            or row_l[6] in dict_mal_hosts[file_name])) + '\n'
                         line = ','.join(row_l) # Form row as a string
                         input_file.write(line) # Write line to input.csv
                         line = binet_file.readline() # Get Next row

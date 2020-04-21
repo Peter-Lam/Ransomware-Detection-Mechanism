@@ -1,0 +1,8 @@
+binet_output_path: ../../data/external/validation
+dataset_path: ./inputs/validation_url_list.json
+dir_dict_path: ./inputs/dir_mapping.json
+interim_output_path: ../../data/interim/val_interim.csv
+preprocessed_output_path: ../../data/preprocessed/val_preprocessed.csv
+proto_dict_path: ./inputs/protocol_mapping.json
+raw_output_path: ../../data/raw/val_input.csv
+state_dict_path: ./inputs/state_mapping.json

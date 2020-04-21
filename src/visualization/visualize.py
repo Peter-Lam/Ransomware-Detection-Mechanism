@@ -14,7 +14,6 @@ from utils.file_util import load_yaml
 
 #Global
 CONFIG_PATH = './visualize_config.yml'
-OUTPUT_BASE_PATH = '../../reports/figures/'
 
 def main():
     '''main'''
@@ -61,40 +60,18 @@ def plot_base_frequencies(processed_df, output_base_path):
     save_png(axes.get_figure(), output_base_path, 'state_count')
     plt.clf()
 
-    #Port Count
-    port_cols = [
-        'sis_known_port',
-        'sis_reg_port',
-        'sis_dyn_port',
-        'dis_known_port',
-        'dis_reg_port',
-        'dis_dyn_port'
-    ]
+    #Sport Count
+    axes = plt.subplots(figsize=(10, 5))
+    axes = sns.barplot()
+    axes = sns.countplot(x='Sport_Int', hue='Label', palette='husl', data=processed_df)
+    save_png(axes.get_figure(), output_base_path, 'sport_count')
+    plt.clf()
 
-    x_values = []
-    y_values = []
-    hue_l = []
-    for port_name in port_cols:
-        port_s = processed_df.loc[processed_df[port_name] == 1]
-        label_counts = port_s['Label'].value_counts()
-        x_values.append(port_name)
-        x_values.append(port_name)
-        y_values.append(label_counts[-1])
-        y_values.append(label_counts[1])
-        hue_l.append(-1)
-        hue_l.append(1)
-
-    port_df = pd.DataFrame(data={
-        'Ports': x_values,
-        'tot_label_count': y_values,
-        'Label': hue_l
-        })
-    axes = sns.barplot(x='Ports',
-                       y='tot_label_count',
-                       hue='Label',
-                       palette='husl',
-                       data=port_df)
-    save_png(axes.get_figure(), output_base_path, 'port_count')
+    #Dport Count
+    axes = plt.subplots(figsize=(10, 5))
+    axes = sns.barplot()
+    axes = sns.countplot(x='Dport_Int', hue='Label', palette='husl', data=processed_df)
+    save_png(axes.get_figure(), output_base_path, 'dport_count')
     plt.clf()
 
 def save_png(fig, output_base_path, file_name):
@@ -105,7 +82,7 @@ def save_png(fig, output_base_path, file_name):
 def plot_and_save_pairplot(dataframe, x_vars, y_vars, output_base_path, file_name):
     '''
         Will create a seaborn pairplot with a given dataframe, x and y variables
-        on hue Label (Malicious 1, Benign -1)
+        on hue Label (Malicious 1, Benign 0)
         Saves to output path with provided file name.
     '''
     plt.clf()

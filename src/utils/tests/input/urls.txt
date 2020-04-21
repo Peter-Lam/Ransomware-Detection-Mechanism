@@ -1,4 +1,0 @@
-http://www.google[.]com/search?q=\"test"
-https://www.facebook.com
-asdfadfadsf
-asdfadfadsf.asdf

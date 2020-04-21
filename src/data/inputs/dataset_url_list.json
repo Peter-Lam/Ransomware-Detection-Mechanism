@@ -3,7 +3,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-114-1/2015-04-09_capture-win2.binetflow",
         "malware": "emotet",
         "type": "MD5",
-        "infected_host": "10.0.2.102",
+        "infected_host": ["10.0.2.102"],
         "infected_gw": "",
         "value": "8baa9b809b591a11af423824f4d9726a"
     },
@@ -11,7 +11,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-114-2/2015-04-22_capture-win2.binetflow",
         "malware": "emotet",
         "type": "MD5",
-        "infected_host": "10.0.2.102",
+        "infected_host": ["10.0.2.102"],
         "infected_gw": "",
         "value": "8baa9b809b591a11af423824f4d9726a"
     },
@@ -19,7 +19,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-114-3/2015-06-07_capture-win2.binetflow",
         "malware": "emotet",
         "type": "MD5",
-        "infected_host": "10.0.2.102",
+        "infected_host": ["10.0.2.102"],
         "infected_gw": "",
         "value": "8baa9b809b591a11af423824f4d9726a"
     },
@@ -27,7 +27,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-114-4/2015-07-08_capture-win2.binetflow",
         "malware": "emotet",
         "type": "MD5",
-        "infected_host": "10.0.2.102",
+        "infected_host": ["10.0.2.102"],
         "infected_gw": "",
         "value": "8baa9b809b591a11af423824f4d9726a"
     },
@@ -35,7 +35,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-124-1/2015-04-30_capture-win5.binetflow",
         "malware": "emotet",
         "type": "MD5",
-        "infected_host": "10.0.2.105",
+        "infected_host": ["10.0.2.105"],
         "infected_gw": "",
         "value": "84b96b96f60284a21addb1b2873d6aaa"
     },
@@ -43,7 +43,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-264-1/2017-06-24_win3.binetflow",
         "malware": "emotet",
         "type": "MD5",
-        "infected_host": "192.168.1.113",
+        "infected_host": ["192.168.1.113"],
         "infected_gw": "192.168.1.2",
         "value": "28140bd636324bad2f0e8394f3e7f723"
     },
@@ -51,7 +51,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-264-2/2017-06-24_win15.binetflow",
         "malware": "emotet",
         "type": "MD5",
-        "infected_host": "192.168.1.125",
+        "infected_host": ["192.168.1.125"],
         "infected_gw": "192.168.1.2",
         "value": "28140bd636324bad2f0e8394f3e7f723"
     },
@@ -59,7 +59,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-268-1/2017-06-24_win7.binetflow",
         "malware": "emotet",
         "type": "MD5",
-        "infected_host": "192.168.1.117",
+        "infected_host": ["192.168.1.117"],
         "infected_gw": "192.168.1.2",
         "value": "ac765e9809de73f444cd2cce04256dac"
     },
@@ -67,7 +67,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-269-1/2017-06-24_win8.binetflow",
         "malware": "emotet",
         "type": "MD5",
-        "infected_host": "192.168.1.118",
+        "infected_host": ["192.168.1.118"],
         "infected_gw": "192.168.1.2",
         "value": "3988863fb18686dc6657245afddb597d"
     },
@@ -75,7 +75,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-271-1/2017-06-24_win10.binetflow",
         "malware": "emotet",
         "type": "MD5",
-        "infected_host": "192.168.1.119",
+        "infected_host": ["192.168.1.119"],
         "infected_gw": "192.168.1.2",
         "value": "a2350072233e3547a07a2b38509e8711"
     },
@@ -83,7 +83,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-272-1/2017-06-24_win11.binetflow",
         "malware": "emotet",
         "type": "MD5",
-        "infected_host": "192.168.1.121",
+        "infected_host": ["192.168.1.121"],
         "infected_gw": "192.168.1.2",
         "value": "8a5d3cada819fe7fd9db67d8c0af120e"
     },
@@ -91,7 +91,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-276-1/2017-06-24_win16.binetflow",
         "malware": "emotet",
         "type": "MD5",
-        "infected_host": "192.168.1.126",
+        "infected_host": ["192.168.1.126"],
         "infected_gw": "192.168.1.2",
         "value": "fa0cea9b855b83dc6a9f8d931882efd2"
     },
@@ -99,7 +99,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-276-2/2017-06-24_win17.binetflow",
         "malware": "emotet",
         "type": "MD5",
-        "infected_host": "192.168.1.127",
+        "infected_host": ["192.168.1.127"],
         "infected_gw": "192.168.1.2",
         "value": "fa0cea9b855b83dc6a9f8d931882efd2"
     },
@@ -107,7 +107,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-279-1/2017-06-24_win20.binetflow",
         "malware": "emotet",
         "type": "MD5",
-        "infected_host": "192.168.1.130",
+        "infected_host": ["192.168.1.130"],
         "infected_gw": "192.168.1.2",
         "value": "402d735e59d191b2bde2f5f094688de5"
     },
@@ -115,7 +115,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-238-1/2017-3-30_win6.binetflow",
         "malware": "trickbot",
         "type": "MD5",
-        "infected_host": "192.168.1.116",
+        "infected_host": ["192.168.1.116"],
         "infected_gw": "192.168.1.2",
         "value": "b6d9e83f6e157c259da155e562bfe04b"
     },
@@ -123,7 +123,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-239-1/2017-3-30_win7.binetflow",
         "malware": "trickbot",
         "type": "MD5",
-        "infected_host": "192.168.1.117",
+        "infected_host": ["192.168.1.117"],
         "infected_gw": "192.168.1.2",
         "value": "b0aecb48821a18210a2838fbeed800f1"
     },
@@ -131,7 +131,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-240-1/2017-3-29_win8.binetflow",
         "malware": "trickbot",
         "type": "MD5",
-        "infected_host": "192.168.1.118",
+        "infected_host": ["192.168.1.118"],
         "infected_gw": "192.168.1.2",
         "value": "c957c5be0a2985adf600988f477cb491"
     },
@@ -139,7 +139,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-241-1/2017-3-30_win9.binetflow",
         "malware": "trickbot",
         "type": "MD5",
-        "infected_host": "192.168.1.119",
+        "infected_host": ["192.168.1.119"],
         "infected_gw": "192.168.1.2",
         "value": "7c919970a593c41ec104fa2fb7f0d12b"
     },
@@ -147,7 +147,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-242-1/2017-3-30_win10.binetflow",
         "malware": "trickbot",
         "type": "MD5",
-        "infected_host": "192.168.1.220",
+        "infected_host": ["192.168.1.220"],
         "infected_gw": "192.168.1.2",
         "value": "d2bff49cba429d2c53fc4a2852cd9977"
     },
@@ -155,7 +155,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-243-1/2017-04-12_win5.binetflow",
         "malware": "trickbot",
         "type": "MD5",
-        "infected_host": "192.168.1.115",
+        "infected_host": ["192.168.1.115"],
         "infected_gw": "192.168.1.2",
         "value": "c4ea8104af713582afb76f773a037f28"
     },
@@ -163,7 +163,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-244-1/2017-04-12_win11.binetflow",
         "malware": "trickbot",
         "type": "MD5",
-        "infected_host": "192.168.1.121",
+        "infected_host": ["192.168.1.121"],
         "infected_gw": "192.168.1.2",
         "value": "4c1e2650a7d104b695a853f64a455cfa"
     },
@@ -171,7 +171,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-247-1/2017-04-17_win14.binetflow",
         "malware": "trickbot",
         "type": "MD5",
-        "infected_host": "192.168.1.124",
+        "infected_host": ["192.168.1.124"],
         "infected_gw": "192.168.1.2",
         "value": "0afaa4f4137b846e456e52f72faf9aa0"
     },
@@ -179,7 +179,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-261-1/2017-05-15_win15.binetflow",
         "malware": "trickbot",
         "type": "MD5",
-        "infected_host": "192.168.1.125",
+        "infected_host": ["192.168.1.125"],
         "infected_gw": "192.168.1.2",
         "value": "bb9e0b23fc6cba27ba670547b7890273"
     },
@@ -187,7 +187,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-261-2/2017-06-07_win12.binetflow",
         "malware": "trickbot",
         "type": "MD5",
-        "infected_host": "192.168.1.122",
+        "infected_host": ["192.168.1.122"],
         "infected_gw": "192.168.1.2",
         "value": "bb9e0b23fc6cba27ba670547b7890273"
     },
@@ -195,7 +195,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-265-1/2017-06-24_win4.binetflow",
         "malware": "trickbot",
         "type": "MD5",
-        "infected_host": "192.168.1.114",
+        "infected_host": ["192.168.1.114"],
         "infected_gw": "192.168.1.2",
         "value": "45160aa23d640f8d1bcb263c179f84f9"
     },
@@ -203,7 +203,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-266-1/2017-06-24_win5.binetflow",
         "malware": "trickbot",
         "type": "MD5",
-        "infected_host": "192.168.1.115",
+        "infected_host": ["192.168.1.115"],
         "infected_gw": "192.168.1.2",
         "value": "be4c49482221630647a8038ce977fc4f"
     },
@@ -211,7 +211,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-267-1/2017-06-24_win6.binetflow",
         "malware": "trickbot",
         "type": "MD5",
-        "infected_host": "192.168.1.116",
+        "infected_host": ["192.168.1.116"],
         "infected_gw": "192.168.1.2",
         "value": "9d166a822439a47eb2dfad1aeb823638"
     },
@@ -219,7 +219,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-273-1/2017-06-24_win12.binetflow",
         "malware": "trickbot",
         "type": "MD5",
-        "infected_host": "192.168.1.122",
+        "infected_host": ["192.168.1.122"],
         "infected_gw": "192.168.1.2",
         "value": "49c19450ce74c4941940c70b8c51f22a"
     },
@@ -227,7 +227,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-324-1/2018-01-30_win13.binetflow",
         "malware": "trickbot",
         "type": "MD5",
-        "infected_host": "192.168.1.123",
+        "infected_host": ["192.168.1.123"],
         "infected_gw": "192.168.1.2",
         "value": "3d5eeaa64da02d7066e5f57c25368757"
     },
@@ -235,7 +235,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-325-1/2018-01-30_win9.binetflow",
         "malware": "trickbot",
         "type": "MD5",
-        "infected_host": "192.168.1.119",
+        "infected_host": ["192.168.1.119"],
         "infected_gw": "192.168.1.2",
         "value": "011517b0b3c6a79d740033df71120392"
     },
@@ -243,7 +243,7 @@
         "source": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-327-1/capture_win11.binetflow",
         "malware": "trickbot",
         "type": "MD5",
-        "infected_host": "192.168.1.121",
+        "infected_host": ["192.168.1.121"],
         "infected_gw": "192.168.1.2",
         "value": "2b48789d9272700de5405bf9a9c05204"
     }

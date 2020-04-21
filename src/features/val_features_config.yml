@@ -1,0 +1,7 @@
+num_window_size: 10000
+minutes_window_size: 10
+preprocessed_path: ../../data/preprocessed/val_preprocessed.csv
+pd_roll_time_size: 10T
+processed_path: ../../data/processed/val_processed.csv
+sample_processed_path: ../../data/processed/sample_val_processed.csv
+sample_size: 50

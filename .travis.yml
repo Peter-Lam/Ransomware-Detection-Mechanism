@@ -10,5 +10,5 @@ script:
   - pylint ./src/kibana/
   - pylint ./src/data/scripts/
   - pylint ./src/visualization/
+  - pylint ./src/features/
   - pylint ./src/utils/
-  - ./travis_build.sh

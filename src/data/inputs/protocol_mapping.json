@@ -1,0 +1,14 @@
+{
+    "Unknown": 0,
+    "icmp": 1,
+    "igmp": 2,
+    "tcp": 6,
+    "udp": 17,
+    "esp":  50,
+    "ipv6-icmp": 58,
+    "pim": 103,
+    "ipx/spx": 111,
+    "rtp": 145,
+    "rtcp": 146,
+    "unas": 144
+}

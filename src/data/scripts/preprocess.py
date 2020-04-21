@@ -10,7 +10,7 @@ import sys
 import pandas as pd
 
 sys.path.append('../')
-from utils.file_util import load_yaml
+from utils.file_util import load_yaml, load_json
 
 #Global
 CONFIG_PATH = './config.yml'
@@ -30,13 +30,14 @@ def make_preprocess():
     config = load_yaml(CONFIG_PATH)
     interim_output_path = config['interim_output_path']
     preprocessed_output_path = config['preprocessed_output_path']
-
+    proto_dict = load_json(config['proto_dict_path'])
+    dir_dict = load_json(config['dir_dict_path'])
+    state_dict = load_json(config['state_dict_path'])
     # Well-known ports range from 0 through 1023
     # Registered ports are 1024 to 49151
     # Dynamic ports (also called private ports) are 49152 to 65535
     port_bins = [0, 1023, 49151, 65535]
-    s_labels = ['sis_known_port', 'sis_reg_port', 'sis_dyn_port']
-    d_labels = ['dis_known_port', 'dis_reg_port', 'dis_dyn_port']
+    port_labels = [0, 1, 2]
 
     interim_df = pd.read_csv(interim_output_path,
                              sep=',',
@@ -44,21 +45,29 @@ def make_preprocess():
     preprocessed_df = interim_df
     preprocessed_df['StartTime'] = pd.to_datetime(preprocessed_df['StartTime'])
 
-    s_port_series = pd.cut(preprocessed_df['Sport'], bins=port_bins,
-                           labels=s_labels, include_lowest=True)
+    preprocessed_df['Proto_Int'] = preprocessed_df['Proto'].map(proto_dict)
+    preprocessed_df['Proto_Int'].fillna(proto_dict['Unknown'])
+    preprocessed_df['Proto_Int'] = preprocessed_df['Proto_Int'].astype('category')
 
-    d_port_series = pd.cut(preprocessed_df['Dport'], bins=port_bins,
-                           labels=d_labels, include_lowest=True)
+    preprocessed_df['Sport_Int'] = pd.cut(preprocessed_df['Sport'], bins=port_bins,
+                                          labels=port_labels, include_lowest=True)
+    preprocessed_df['Sport_Int'] = preprocessed_df['Sport_Int'].astype('category')
+
+    preprocessed_df['Dir_Int'] = preprocessed_df['Dir'].map(dir_dict)
+    preprocessed_df['Dir_Int'] = preprocessed_df['Dir_Int'].fillna(dir_dict['Unknown'])
+    preprocessed_df['Dir_Int'] = preprocessed_df['Dir_Int'].astype('category')
+
+    preprocessed_df['Dport_Int'] = pd.cut(preprocessed_df['Dport'], bins=port_bins,
+                                          labels=port_labels, include_lowest=True)
+    preprocessed_df['Dport_Int'] = preprocessed_df['Dport_Int'].astype('category')
+
+    preprocessed_df['State_Int'] = preprocessed_df['State'].map(state_dict)
+    preprocessed_df['State_Int'] = preprocessed_df['State_Int'].fillna(state_dict['Unknown'])
+    preprocessed_df['State_Int'] = preprocessed_df['State_Int'].astype('category')
 
     preprocessed_df['is_fwd'] = preprocessed_df['Sport']
     preprocessed_df.loc[preprocessed_df['Sport'] >= 1024, 'is_fwd'] = 1
     preprocessed_df.loc[preprocessed_df['Sport'] < 1024, 'is_fwd'] = 0
-
-    preprocessed_df = preprocessed_df.join(pd.get_dummies(preprocessed_df['Proto']))
-    preprocessed_df = preprocessed_df.join(pd.get_dummies(s_port_series))
-    preprocessed_df = preprocessed_df.join(pd.get_dummies(preprocessed_df['Dir']))
-    preprocessed_df = preprocessed_df.join(pd.get_dummies(d_port_series))
-    preprocessed_df = preprocessed_df.join(pd.get_dummies(preprocessed_df['State']))
 
     makedirs(dirname(preprocessed_output_path), exist_ok=True)
     preprocessed_df.to_csv(preprocessed_output_path, index=False)
