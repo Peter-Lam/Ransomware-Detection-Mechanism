@@ -1,7 +1,7 @@
 Ransomware-Detection-Mechanism
 ==============================
 [![Build Status](https://travis-ci.com/TranAlan/Ransomware-Detection-Mechanism.svg?token=XYhputEuMBMoSF6Pp5xP&branch=master)](https://travis-ci.com/TranAlan/Ransomware-Detection-Mechanism)  
-Ransomware Detection Mechanism (RDM) is a tool for both combining machine learning to detect ransomware viruses within a network and to collect, visualize, and analyze IOCs for emotet. This is a 2020 University of Ottawa undergraduate honours project.
+Ransomware Detection Mechanism (RDM) is a tool for both combining machine learning to detect ransomware viruses within a network and to collect, visualize, and analyze IOCs for emotet. This is a 2020 University of Ottawa undergraduate honours project. For more a detailed summary of our work, checkout our report " \Report-Ransomware_Detection_using_Supervised Learning.pdf"
 
 ## Project Members
 * [Alan Tran](https://www.linkedin.com/in/alantran29/)
@@ -135,6 +135,9 @@ You are now ready to run scripts. Proceed to Kibana or Training for more informa
 ### Setting up RDM Kibana Environment
 For information on how to set up the RDM Kibana Environment with the IOCS, see the [Setting Up Kibana Environment](https://github.com/TranAlan/Ransomware-Detection-Mechanism/wiki/Setting-Up-Kibana-Environment) page.
 
+### Using BulkAPI JSON Scripts
+For information on how to use BulkAPI JSON scripts, see the [How to Use Bulk JSON Scripts](https://github.com/TranAlan/Ransomware-Detection-Mechanism/wiki/How-to-Use-Bulk-JSON-Scripts) page.
+
 ## Pipeline
     ├── 1. Preparing Data (1.3 mil rows)                  <- /src/data> python make_dataset.py
     │      ├── 1. Download data sets        (8.5  min)
@@ -190,5 +193,3 @@ $ python predict_model.py
 ## More Information
 Visit the [Github Wiki](https://github.com/TranAlan/Ransomware-Detection-Mechanism/wiki) for more documentation and research on the project.
 
-### Using BulkAPI JSON Scripts
-For information on how to use BulkAPI JSON scripts, see the [How to Use Bulk JSON Scripts](https://github.com/TranAlan/Ransomware-Detection-Mechanism/wiki/How-to-Use-Bulk-JSON-Scripts) page.
