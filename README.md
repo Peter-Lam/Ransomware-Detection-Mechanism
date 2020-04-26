@@ -154,13 +154,25 @@ For information on how to use BulkAPI JSON scripts, see the [How to Use Bulk JSO
     └── 4. Predict Model                    (24.7  min)     <- /src/models> python predict_model.py
 
 ## Docker
+
+Prerequisite: Download and extract csv files and place in proper path or run make_dataset and build_features. [CSV Files](https://drive.google.com/drive/u/1/folders/1ROA5mCQMR_uJ9IyfxvQ-HDx1jyh0uRgI) This is done as Github only allows upload of no larger than 100 MB without Git LFS.
+
+To extract files:
+```
+tar -xzvf processed.tar.gz
+tar -xzvf val_processed.tar.gz
+```
+
 ### Train
+Place processed.csv in /data/processed
 ```bash
 $ docker build -f DockerTrain/Dockerfile -t train_model:latest .
 $ docker run -d train_model:latest
 ```
 
 ### Predict
+Place processed.csv in /data/processed/
+Place val_processed.csv in /data/processed/
 ```bash
 $ docker build -f DockerPredict/Dockerfile -t predict_model:latest .
 $ docker run -d predict_model:latest
